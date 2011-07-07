@@ -44,3 +44,16 @@ class Logd(object):
         raw = reversed(r.sort(base, by='nosort', start=0, num=limit, get='%s:*' % base))
         return [msgpack.loads(r) for r in raw]
 
+    def get_level_lines(self, path, level, limit=50):
+        r = self.redis
+        base = '%s:log:%s' % (logd, path)
+        key = '%s:level:%s' % (base, level)
+        raw = reversed(r.sort(key, by='nosort', start=0, num=limit, get='%s:*' % base))
+        return [msgpack.loads(r) for r in raw]
+
+    def get_logger_lines(self, path, logger, limit=50):
+        r = self.redis
+        base = '%s:log:%s' % (logd, path)
+        key = '%s:name:%s' % (base, logger)
+        raw = reversed(r.sort(key, by='nosort', start=0, num=limit, get='%s:*' % base))
+        return [msgpack.loads(r) for r in raw]
