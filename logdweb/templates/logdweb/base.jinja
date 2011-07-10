@@ -1,6 +1,11 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="{{ reverse('logd-media', kwargs={"path":"css/screen.css"}) }}" type="text/css" media="screen" charset="utf-8"> 
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="{{ reverse('logd-media', kwargs={'path':'js/logdweb.js'}) }}"></script>
+		<script type="text/javascript">
+			logd_base_url = "{{ logd_base_url }}";
+		</script>
 	</head>
 
 	<body>
@@ -8,8 +13,12 @@
 			{% block header %} {% endblock %}
 		</div>
 		<div id="body">
-			<div id="sidebar">{% block sidebar %}{% endblock %}</div>
-			<div id="main">{% block main %}{% endblock %}</div>
+			<div id="sidebar">
+				{% block sidebar %}{% endblock %}
+			</div>
+			<div id="main">
+				{% block main %}{% endblock %}
+			</div>
 		</div>
 	</body>
 </head>

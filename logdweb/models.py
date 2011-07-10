@@ -38,6 +38,13 @@ class Logd(object):
             logfiles.append(log)
         return {'logfiles': logfiles}
 
+    def get_keys(self, path, key, limit=50):
+        r = self.redis
+        base = '%s:log:%s' % (logd, path)
+        raw = reversed(r.sort(base, by='nosort', start=0, num=limit,
+            get=['%s:*' % (base), '#']))
+
+
     def get_lines(self, path, limit=50):
         r = self.redis
         base = '%s:log:%s' % (logd, path)
@@ -57,3 +64,16 @@ class Logd(object):
         key = '%s:name:%s' % (base, logger)
         raw = reversed(r.sort(key, by='nosort', start=0, num=limit, get='%s:*' % base))
         return [msgpack.loads(r) for r in raw]
+
+    def get_new_lines(self, path, latest, level=None, logger=None):
+        """Get new lines for a path and optional level/logger.  Only returns
+        lines with an id newer than ``latest``."""
+        r = self.redis
+        if level:
+            lines = self.get_level_lines(self, path, level)
+        elif logger:
+            lines = self.get_logger_lines(self, path, logger)
+        else:
+            lines = self.get_lines(path, limit=20)
+        return [l for l in lines if l['id'] > latest]
+

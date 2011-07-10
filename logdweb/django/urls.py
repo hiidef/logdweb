@@ -14,6 +14,7 @@ urlpatterns = patterns('logdweb.django.views',
     (r'^(?P<path>[^/]+)/?$', 'path_index', {}, 'logd-path-index'),
     (r'^(?P<path>[^/]+)/level/(?P<level>[^/]+)/?$', 'path_level', {}, 'logd-path-level'),
     (r'^(?P<path>[^/]+)/logger/(?P<logger>[^/]+)/?$', 'path_logger', {}, 'logd-path-logger'),
+    (r'^(?P<path>[^/]+)/new/?$', 'path_new', {}, 'logd-path-new'),
 )
 
 urlpatterns += patterns('django.views.static',

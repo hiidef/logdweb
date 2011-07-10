@@ -82,4 +82,6 @@ h2 { margin: 5px 0 20px 0; font-size: 16px; }
     font-family: consolas, inconsolata, menlo, monaco, monospace; 
     font-size: 10px;
 }
+
 .log td { padding: 0 2px 0 2px; }
+td.hidden { display: none; }

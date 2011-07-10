@@ -1,4 +1,5 @@
 {% extends "logdweb/base.jinja" %}
+{% import "logdweb/lib.jinja" as lib %}
 
 {% block header %}
 	<h1 class="title"><a href="{{ reverse('logd-index') }}">logd admin</a></h1>
@@ -22,18 +23,10 @@
 
 {% block main %}
 	{% if path %}
-		<h2>{{ path }}</h2>
-		<table class="log">
+		<h2>{% if level or logger %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }}{% endif %}</h2>
+		<table class="log" id="{{ path }}">
 			{% for line in lines %}
-				<tr>
-					<td class="level">
-					<a href="{{ reverse('logd-path-level', kwargs={'path':path, 'level': line['level']}) }}" class="{{ line['level'].lower() }}">{{ line['level'].lower()}}</a>
-					</td>
-					<td class="logger">
-						<a href="{{ reverse('logd-path-logger', kwargs={'path': path, 'logger': line['name']}) }}">{{ line['name'] }}</a>
-					</td>
-					<td class="msg">{{ line['msg'] }}</td>
-				</tr>
+				{{ lib.render_line(line, path) }}
 			{% endfor %}
 		</table>
 	{% endif %}
