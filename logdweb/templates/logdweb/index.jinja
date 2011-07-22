@@ -24,10 +24,12 @@
 {% block main %}
 	{% if path %}
 		<h2>{% if level or logger %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }}{% endif %}</h2>
-		<table class="log" id="{{ path }}">
-			{% for line in lines %}
-				{{ lib.render_line(line, path) }}
-			{% endfor %}
-		</table>
+        <div class="log-container">
+            <table class="log" id="{{ path }}{% if level %}/level/{{level}}{%endif%}{%if logger %}/logger/{{logger}}{%endif%}">
+                {% for line in lines %}
+                    {{ lib.render_line(line, path) }}
+                {% endfor %}
+            </table>
+        </div>
 	{% endif %}
 {% endblock %}

@@ -68,7 +68,7 @@ a:hover { text-decoration: underline; }
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 1px 1px #c5c5c5;
-    min-height: 800px;
+    min-height: 700px;
     padding: 20px;
     margin: 2em 0 2em 2em;
     margin-right: 350px;
@@ -85,3 +85,10 @@ h2 { margin: 5px 0 20px 0; font-size: 16px; }
 
 .log td { padding: 0 2px 0 2px; }
 td.hidden { display: none; }
+
+div.log-container {
+    max-height: 700px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 3px;
+}

@@ -18,8 +18,11 @@ from logdweb.django import settings
 
 import redis
 import msgpack
+import logging
 
 logd = settings.LOGD_REDIS_PREFIX
+
+logger = logging.getLogger(__name__)
 
 class Logd(object):
     def __init__(self):
@@ -69,11 +72,18 @@ class Logd(object):
         """Get new lines for a path and optional level/logger.  Only returns
         lines with an id newer than ``latest``."""
         r = self.redis
-        if level:
-            lines = self.get_level_lines(self, path, level)
-        elif logger:
-            lines = self.get_logger_lines(self, path, logger)
-        else:
-            lines = self.get_lines(path, limit=20)
+        def get_lines(limit=20):
+            if level:
+                lines = self.get_level_lines(path, level, limit=limit)
+            elif logger:
+                lines = self.get_logger_lines(path, logger, limit=limit)
+            else:
+                lines = self.get_lines(path, limit=limit)
+            return lines
+        lines = get_lines()
+        if lines[-1]['id'] > latest:
+            diff = latest - lines[-1]['id']
+            diff += 50
+            lines = get_lines(limit=diff)
         return [l for l in lines if l['id'] > latest]
 

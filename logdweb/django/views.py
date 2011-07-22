@@ -48,16 +48,17 @@ def path_logger(request, path="", logger=""):
     context = make_context(info=info, path=path, logger=logger, lines=lines)
     return render_to_response('logdweb/index.jinja', context, request)
 
-def path_new(request, path=""):
+def path_new(request, path="", level="", logger=""):
     """Fetch the new from a path."""
     try:
         from_id = int(request.GET['id'])
     except (ValueError, KeyError):
         raise Http404
     logd = models.Logd()
-    new = logd.get_new_lines(path, from_id)
+    new = logd.get_new_lines(path, from_id, level=level, logger=logger)
     for line in new:
         line['rendered'] = render_to_string('logdweb/single_line.jinja',
             {'path':path, 'line':line})
     return HttpResponse(json.dumps(new), mimetype='application/javascript')
+
 
