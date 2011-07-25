@@ -42,6 +42,24 @@ var viewSettings = {
     });
   };
 
+  /* alter a chart.  send it a mapping of new parameters for the url
+   * and it will alter the charts parameters and reload it.
+   */
+  $.fn.alterChart = function(opts) {
+    $.each(this, function() {
+      var src = this.src;
+      for (var key in opts) {
+        var re = new RegExp(key + "=[^&]+");
+        if ( src.match(re) ) {
+          src = src.replace(new RegExp(key + "=[^&]+"), key + '=' + opts[key]);
+        } else {
+          src += '&' + key + '=' + opts[key];
+        }
+      }
+      this.src = src
+    });
+  };
+
   /* update the log once per second */
   setInterval(function() {
     $('table.log').updateLog();
