@@ -140,33 +140,35 @@ def stats_tree(keys):
     """Given a bunch of keys, make a tree such that similarly prefixed stats
     are at the same level underneath eachother."""
     keys = list(keys)
-    keys.sort()
 
-    def add_bit(d, key):
-        parts = key.split('.')
-        if len(parts) > 2:
-            for part in parts[:-2]:
-                if part in d and isinstance(d[part], basestring):
-                    d[part] = {d[part]: {}}
-                else:
-                    d.setdefault(part, {})
-                d = d[part]
-            d.setdefault(parts[-2], []).append(parts[-1])
-        elif len(parts) == 2:
-            one, two = parts
-            if one in d and isinstance(d[one], dict):
-                d[one].setdefault(two, {})
-            else:
-                d[one] = two
-        else:
-            pass
+    def reduce_tree(tree):
+        keys = list(sorted(tree.keys()))
+        for k,v in tree.items():
+            if '.' not in k and not v:
+                tree[k] = []
+        if len(tree) == 1:
+            return tree.keys()
+        prefixes = [k.split('.', 1)[0] for k in tree.keys() if '.' in k]
+        if len(prefixes) == len(list(set(prefixes))):
+            return tree.keys()
+        for key in keys:
+            if '.' not in key:
+                continue
+            p,k = key.split('.', 1)
+            tree.setdefault(p, {})
+            if isinstance(tree[p], dict):
+                tree[p][k] = {}
+            elif not tree[p]:
+                tree[p] = {k:{}}
+            del tree[key]
 
-    tree = {}
-    for key in keys:
-        add_bit(tree, key)
+        for k,v in tree.items():
+            if v and isinstance(v, dict):
+                tree[k] = reduce_tree(v)
+        return tree
 
-    # FIXME:
-    # from here, we have to flatten keys that have zero or one values
+    tree = dict([(k,{}) for k in keys])
+    reduce_tree(tree)
     return tree
 
 
