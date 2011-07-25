@@ -21,6 +21,8 @@ LOGD_REDIS_PREFIX = getattr(settings, 'LOGD_REDIS_PREFIX', 'logd')
 LOGD_GRAPHITE_WEB_HOST = getattr(settings, 'LOGD_GRAPHITE_WEB_HOST', 'localhost')
 LOGD_GRAPHITE_WEB_PORT = getattr(settings, 'LOGD_GRAPHITE_WEB_PORT', 3333)
 
+LOGD_GRAPHITE_WEB_BASE = "http://%s:%s" % (LOGD_GRAPHITE_WEB_HOST, LOGD_GRAPHITE_WEB_PORT)
+
 # jinja related;  these are not standard, but are pretty well adopted
 
 JINJA_CACHE_SIZE = getattr(settings, 'JINJA_CACHE_SIZE', 0)

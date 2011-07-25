@@ -1,0 +1,25 @@
+{% extends "logdweb/index.jinja" %}
+{% import "logdweb/lib.jinja" as lib %}
+
+{% block main %}
+	<style type="text/css">
+		div.chart img { 
+			box-shadow: 2px 2px 5px #aaa; 
+		}
+
+		div.chart {
+			margin-bottom: 2em;
+		}
+	</style>
+	<h2>{{ stat }} : {{ bucket }}</h2>
+	{{ render_charts(chart) }}
+{% endblock %}
+
+{% macro render_charts(chart) -%}
+	{% for key,data in chart.chartmap.iteritems() %}
+		<div class="chart">
+			<img src="{{ chart.url(key) }}" alt="{{ key }}" />
+		</div>
+	{% endfor %}
+{%- endmacro %}
+

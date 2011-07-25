@@ -68,6 +68,9 @@ def stats_index(request, stat):
     graphite = models.Graphite()
     info = logd.server_info()
     stats = graphite.get_stats()
+    for stat in stats.keys():
+        for bucket in stats[stat].keys():
+            stats[stat][bucket] = models.stats_tree(stats[stat][bucket])
     context = make_context(info=info, stats=stats, stat=stat)
     return render_to_response('logdweb/stats.jinja', context, request)
 
@@ -76,6 +79,9 @@ def stats_chart(request, stat, bucket):
     graphite = models.Graphite()
     info = logd.server_info()
     stats = graphite.get_stats()
-    context = make_context(info=info, stats=stats, stat=stat)
-    return render_to_response('logdweb/stats.jinja', context, request)
+    pref, bucket = bucket.split('.', 1)
+    chart = dict([(k,v) for k,v in stats[stat][pref].items() if k.startswith(bucket)])
+    chart = models.Chart(chart, stat)
+    context = make_context(info=info, stats=stats, stat=stat, bucket=bucket, chart=chart)
+    return render_to_response('logdweb/charts.jinja', context, request)
 

@@ -24,6 +24,7 @@ except:
 import redis
 import msgpack
 import logging
+import urllib
 import urllib2
 
 logd = settings.LOGD_REDIS_PREFIX
@@ -103,12 +104,14 @@ class Graphite(object):
     def render(self, **kwargs):
         pass
 
-    def get_stats(self):
+    def get_stats(self, usecache=True):
         """Gets stats from Graphite.  These are cached for 30 seconds so
         that graphite isn't clobbered, since getting the stats requires a
         disk read."""
-        ret = settings.cache.get('logd.graphite.get_stats')
-        if ret: return ret
+        if usecache:
+            ret = settings.cache.get('logd.graphite.get_stats')
+            if ret:
+                return ret
         url = '%s/api/stats/list/' % self.baseurl
         stats = json.loads(urllib2.urlopen(url).read())
         # from here we tailor the results for logd
@@ -132,8 +135,10 @@ class Graphite(object):
                 prefix, bucket = k.split(':')
                 buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
                 buckets[prefix]['stats'][bucket] = stat
+
         # set for 30 seconds
-        settings.cache.set('logd.graphite.get_stats', buckets, 30)
+        if usecache:
+            settings.cache.set('logd.graphite.get_stats', buckets, 300)
         return buckets
 
 def stats_tree(keys):
@@ -146,7 +151,7 @@ def stats_tree(keys):
         for k,v in tree.items():
             if '.' not in k and not v:
                 tree[k] = []
-        if len(tree) == 1:
+        if len(tree) == 1 and not tree.values()[0]:
             return tree.keys()
         prefixes = [k.split('.', 1)[0] for k in tree.keys() if '.' in k]
         if len(prefixes) == len(list(set(prefixes))):
@@ -171,6 +176,28 @@ def stats_tree(keys):
     reduce_tree(tree)
     return tree
 
+class Chart(object):
+    def __init__(self, tree, bucket):
+        self.tree = tree
+        self.bucket = bucket
+        self.chartmap = {}
+        self.charts = []
+        for key,value in tree.iteritems():
+            chart = ['%s:%s.%s' % (bucket, key, db) for db in value]
+            self.charts.append(chart)
+            self.chartmap[key] = chart
 
-
+    def url(self, key, time='-1hours'):
+        """Create a chart image URL for the key."""
+        base = settings.LOGD_GRAPHITE_WEB_BASE
+        targets = self.chartmap[key]
+        kws = {'width':700, 'height': 280, 'template': 'default',
+            'from': time}
+        final_targets = []
+        for target in targets:
+            final = 'stats.%s' % target
+            final_targets.append('alias(keepLastValue(%s),"%s")' % (final, target.rsplit('.',1)[1]))
+        kws['target'] = final_targets
+        kws['title'] = key
+        return base + '/render/?%s' % urllib.urlencode(kws, doseq=True)
 

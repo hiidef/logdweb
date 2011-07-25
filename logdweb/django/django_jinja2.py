@@ -30,7 +30,10 @@ env = Environment(
     bytecode_cache=cache,
     cache_size=settings.JINJA_CACHE_SIZE,
 )
-env.globals.update({'reverse': reverse})
+env.globals.update({
+    'reverse': reverse,
+})
+env.globals.update(__builtins__)
 
 for name in settings.JINJA_FILTERS:
     path = settings.JINJA_FILTERS[ name ]

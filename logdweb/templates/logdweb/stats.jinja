@@ -7,19 +7,27 @@
 		.statlist { margin-left: 1em; }
 		.statlist li { list-style: circle; }		
 	</style>
+	<div class="statlist">
 	<h2>{{ stat }}</h2>
-
-	<h3>stats</h3>
-	<ul class="statlist">
-	{% for s in stats[stat]['stats']|sort %}
-		<li><a href="{{ reverse("logd-stat-chart", kwargs={"stat": stat, "bucket": s}) }}">{{ s }}</a></li>
-	{% endfor %}
-	</ul>
-	<h3>timers</h3>
-	<ul class="statlist">
-	{% for s in stats[stat]['timers']|sort %}
-		<li><a href="{{ reverse("logd-stat-chart", kwargs={"stat": stat, "bucket": s}) }}">{{ s }}</a></li>
-	{% endfor %}
-	</ul>
+		{{ statsummary(stats[stat], stat) }}
+	</div>
 {% endblock %}
+
+{% macro statsummary(d, name, path='') -%}
+	<ul>
+	{% for key,value in d.iteritems() %}
+		{% if isinstance(value, list) %}
+			<li> <a href="{{ reverse('logd-stat-chart', kwargs={'stat': name, 'bucket': '%s.%s' % (path, key)}) }}">{{ key }}</a><ul>
+			{% for v in value %}
+			<li><a href="{{ reverse('logd-stat-chart', kwargs={'stat': name, 'bucket': "%s.%s.%s" % (path, key, v) }) }}">{{ v }}</a></li>
+			{% endfor %}
+			</ul></li>
+		{% else %}
+			<li>{{ key }}
+				{{ statsummary(value, name, path='%s.%s' % (path,key) if path else key) }}
+			</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+{%- endmacro %}
 
