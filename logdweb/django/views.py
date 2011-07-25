@@ -75,13 +75,15 @@ def stats_index(request, stat):
     return render_to_response('logdweb/stats.jinja', context, request)
 
 def stats_chart(request, stat, bucket):
+    time = request.GET.get('time', '-1hours')
+    template = request.GET.get('template', 'plain')
     logd = models.Logd()
     graphite = models.Graphite()
     info = logd.server_info()
     stats = graphite.get_stats()
     pref, bucket = bucket.split('.', 1)
     chart = dict([(k,v) for k,v in stats[stat][pref].items() if k.startswith(bucket)])
-    chart = models.Chart(chart, stat)
+    chart = models.Chart(chart, stat, pref, time=time, template=template)
     context = make_context(info=info, stats=stats, stat=stat, bucket=bucket, chart=chart)
     return render_to_response('logdweb/charts.jinja', context, request)
 

@@ -177,27 +177,39 @@ def stats_tree(keys):
     return tree
 
 class Chart(object):
-    def __init__(self, tree, bucket):
+    defaults = {'width':700, 'height': 280}
+    def __init__(self, tree, bucket, prefix, time='-1hours', template='plain'):
         self.tree = tree
         self.bucket = bucket
+        self.prefix = '' if prefix == 'stats' else prefix
+        self.base = 'stats' + '.%s' % (self.prefix) if self.prefix else ''
         self.chartmap = {}
         self.charts = []
         for key,value in tree.iteritems():
             chart = ['%s:%s.%s' % (bucket, key, db) for db in value]
             self.charts.append(chart)
             self.chartmap[key] = chart
+        self.time = time
+        self.template = template
 
-    def url(self, key, time='-1hours'):
+    def url(self, key, time=None, template=None):
         """Create a chart image URL for the key."""
         base = settings.LOGD_GRAPHITE_WEB_BASE
-        targets = self.chartmap[key]
-        kws = {'width':700, 'height': 280, 'template': 'default',
-            'from': time}
+        targets = list(sorted(self.chartmap[key]))
+        kws = dict(self.defaults)
+        time = time or self.time
+        template = template or self.template
+        kws.update({'template': template, 'from': time})
         final_targets = []
         for target in targets:
-            final = 'stats.%s' % target
-            final_targets.append('alias(keepLastValue(%s),"%s")' % (final, target.rsplit('.',1)[1]))
+            final = '%s.%s' % (self.base, target)
+            func = 'alias(keepLastValue(%s),"%s")' % (final, target.rsplit('.',1)[1])
+            if 'timers' in self.base and target.endswith('mean'):
+                final_targets.insert(0, func)
+            else:
+                final_targets.append(func)
         kws['target'] = final_targets
         kws['title'] = key
         return base + '/render/?%s' % urllib.urlencode(kws, doseq=True)
+
 

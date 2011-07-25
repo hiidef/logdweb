@@ -35,14 +35,24 @@ var viewSettings = {
     }
   };
 
+  $.fn.updateChart = function() {
+    $.each(this, function() {
+      var src = this.src.replace(/&_flub=\d+/, '');
+      this.src = src + '&_flub=' + new Date().getTime();
+    });
+  };
+
   /* update the log once per second */
   setInterval(function() {
     $('table.log').updateLog();
   }, 2000);
 
+  setInterval(function() {
+    $('div.chart img').updateChart();
+  }, 10000);
+
   /* set up event handlers on load */
   $(function() {
-    console.log("Called");
     /* disable autoscroll unless container is scrolled to the bottom */
     $('div.log-container').scroll(function(e) {
       var $this = $(this);
