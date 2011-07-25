@@ -1,0 +1,25 @@
+{% extends "logdweb/index.jinja" %}
+{% import "logdweb/lib.jinja" as lib %}
+
+{% block main %}
+	<style type="text/css">
+		.statlist ul { margin-left: 1em; }
+		.statlist { margin-left: 1em; }
+		.statlist li { list-style: circle; }		
+	</style>
+	<h2>{{ stat }}</h2>
+
+	<h3>stats</h3>
+	<ul class="statlist">
+	{% for s in stats[stat]['stats']|sort %}
+		<li><a href="{{ reverse("logd-stat-chart", kwargs={"stat": stat, "bucket": s}) }}">{{ s }}</a></li>
+	{% endfor %}
+	</ul>
+	<h3>timers</h3>
+	<ul class="statlist">
+	{% for s in stats[stat]['timers']|sort %}
+		<li><a href="{{ reverse("logd-stat-chart", kwargs={"stat": stat, "bucket": s}) }}">{{ s }}</a></li>
+	{% endfor %}
+	</ul>
+{% endblock %}
+

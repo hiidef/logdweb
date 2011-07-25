@@ -5,6 +5,7 @@
 
 import os
 from django.conf import settings
+from django.core.cache import cache
 
 TEMPLATE_DIRS = getattr(settings, 'TEMPLATE_DIRS', tuple())
 INSTALLED_APPS = getattr(settings, 'INSTALLED_APPS', tuple('logdweb'))
@@ -16,6 +17,9 @@ LOGD_PORT = getattr(settings, 'LOGD_PORT', 8126)
 LOGD_REDIS_HOST = getattr(settings, 'LOGD_REDIS_HOST', 'localhost')
 LOGD_REDIS_PORT = getattr(settings, 'LOGD_REDIS_PORT', 6379)
 LOGD_REDIS_PREFIX = getattr(settings, 'LOGD_REDIS_PREFIX', 'logd')
+
+LOGD_GRAPHITE_WEB_HOST = getattr(settings, 'LOGD_GRAPHITE_WEB_HOST', 'localhost')
+LOGD_GRAPHITE_WEB_PORT = getattr(settings, 'LOGD_GRAPHITE_WEB_PORT', 3333)
 
 # jinja related;  these are not standard, but are pretty well adopted
 

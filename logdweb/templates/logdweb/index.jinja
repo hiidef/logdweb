@@ -19,6 +19,14 @@
 			</li>
 		{% endfor %}
 	</ul>
+
+	<h2>stats</h2>
+	<ul>
+		{% for stat in stats %}
+			<li><a href="{{ reverse('logd-stat-index', kwargs={'stat': stat}) }}">{{ stat }}</a>
+		{% endfor %}
+	</ul>
+
 {% endblock %}
 
 {% block main %}

@@ -16,9 +16,15 @@ from redis.
 
 from logdweb.django import settings
 
+try:
+    import simplejson as json
+except:
+    import json
+
 import redis
 import msgpack
 import logging
+import urllib2
 
 logd = settings.LOGD_REDIS_PREFIX
 
@@ -86,4 +92,83 @@ class Logd(object):
             diff += 50
             lines = get_lines(limit=diff)
         return [l for l in lines if l['id'] > latest]
+
+
+class Graphite(object):
+    def __init__(self, webhost=None, webport=None):
+        self.host = webhost or settings.LOGD_GRAPHITE_WEB_HOST
+        self.port = webport or settings.LOGD_GRAPHITE_WEB_PORT
+        self.baseurl = 'http://%s:%s' % (self.host, self.port)
+
+    def render(self, **kwargs):
+        pass
+
+    def get_stats(self):
+        """Gets stats from Graphite.  These are cached for 30 seconds so
+        that graphite isn't clobbered, since getting the stats requires a
+        disk read."""
+        ret = settings.cache.get('logd.graphite.get_stats')
+        if ret: return ret
+        url = '%s/api/stats/list/' % self.baseurl
+        stats = json.loads(urllib2.urlopen(url).read())
+        # from here we tailor the results for logd
+        for key in stats.keys():
+            if not key.startswith('stats'):
+                del stats[key]
+        buckets = {}
+        for key, stat in stats.items():
+            if key.startswith('stats.timers'):
+                k = key.replace('stats.timers.', '')
+                prefix, timer = k.split(':')
+                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets[prefix]['timers'][timer] = stat
+            elif key.startswith('stats.counts'):
+                k = key.replace('stats.counts.', '')
+                prefix, count = k.split(':')
+                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets[prefix]['counts'][count] = stat
+            elif ':' in key:
+                k = key.replace('stats.', '')
+                prefix, bucket = k.split(':')
+                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets[prefix]['stats'][bucket] = stat
+        # set for 30 seconds
+        settings.cache.set('logd.graphite.get_stats', buckets, 30)
+        return buckets
+
+def stats_tree(keys):
+    """Given a bunch of keys, make a tree such that similarly prefixed stats
+    are at the same level underneath eachother."""
+    keys = list(keys)
+    keys.sort()
+
+    def add_bit(d, key):
+        parts = key.split('.')
+        if len(parts) > 2:
+            for part in parts[:-2]:
+                if part in d and isinstance(d[part], basestring):
+                    d[part] = {d[part]: {}}
+                else:
+                    d.setdefault(part, {})
+                d = d[part]
+            d.setdefault(parts[-2], []).append(parts[-1])
+        elif len(parts) == 2:
+            one, two = parts
+            if one in d and isinstance(d[one], dict):
+                d[one].setdefault(two, {})
+            else:
+                d[one] = two
+        else:
+            pass
+
+    tree = {}
+    for key in keys:
+        add_bit(tree, key)
+
+    # FIXME:
+    # from here, we have to flatten keys that have zero or one values
+    return tree
+
+
+
 

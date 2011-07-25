@@ -23,8 +23,10 @@ def make_context(**kwargs):
 
 def index(request):
     logd = models.Logd()
+    graphite = models.Graphite()
     info = logd.server_info()
-    context = make_context(info=info)
+    stats = graphite.get_stats()
+    context = make_context(info=info, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_index(request, path=""):
@@ -61,4 +63,19 @@ def path_new(request, path="", level="", logger=""):
             {'path':path, 'line':line})
     return HttpResponse(json.dumps(new), mimetype='application/javascript')
 
+def stats_index(request, stat):
+    logd = models.Logd()
+    graphite = models.Graphite()
+    info = logd.server_info()
+    stats = graphite.get_stats()
+    context = make_context(info=info, stats=stats, stat=stat)
+    return render_to_response('logdweb/stats.jinja', context, request)
+
+def stats_chart(request, stat, bucket):
+    logd = models.Logd()
+    graphite = models.Graphite()
+    info = logd.server_info()
+    stats = graphite.get_stats()
+    context = make_context(info=info, stats=stats, stat=stat)
+    return render_to_response('logdweb/stats.jinja', context, request)
 
