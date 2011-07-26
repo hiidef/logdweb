@@ -29,17 +29,33 @@ var viewSettings = {
           }
           if (viewSettings.autoScroll) {
             $div.scrollTop($div[0].scrollHeight);
+            $this.truncateLog(1000);
           }
         }
       });
     }
+    return this;
   };
+
+  /* truncate a log to a number of lines */
+  $.fn.truncateLog = function(lines) {
+    var $this = $(this);
+    rows = $this.find('tr').length;
+    if (rows > lines) {
+      /* chop the first rows - lines tr's */
+      var num = rows - lines;
+      console.log("pruning " + num + "rows");
+      $this.find('tr:lt(' + num + ')').remove();
+    }
+    return this;
+  }
 
   $.fn.updateChart = function() {
     $.each(this, function() {
       var src = this.src.replace(/&_flub=\d+/, '');
       this.src = src + '&_flub=' + new Date().getTime();
     });
+    return this;
   };
 
   /* alter a chart.  send it a mapping of new parameters for the url
@@ -58,6 +74,7 @@ var viewSettings = {
       }
       this.src = src
     });
+    return this;
   };
 
   /* update the log once per second */
