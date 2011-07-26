@@ -71,11 +71,14 @@ var viewSettings = {
 
   /* set up event handlers on load */
   $(function() {
+    $('table.log').updateLog();
+
     /* disable autoscroll unless container is scrolled to the bottom */
     $('div.log-container').scroll(function(e) {
       var $this = $(this);
       var $inner = $this.find('table.log');
-      if ( Math.abs($inner.offset().top) + $this.height() + $this.offset().top 
+      /* add a fudge factor here */
+      if ( Math.abs($inner.offset().top) + $this.height() + $this.offset().top + 15
             >= $inner.outerHeight()) {
         viewSettings.autoScroll = true;
       } else {
