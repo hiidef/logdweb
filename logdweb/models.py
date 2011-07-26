@@ -186,7 +186,7 @@ class Chart(object):
         self.tree = tree
         self.bucket = bucket
         self.prefix = '' if prefix == 'stats' else prefix
-        self.base = 'stats' + '.%s' % (self.prefix) if self.prefix else ''
+        self.base = 'stats' + ('.%s' % (self.prefix) if self.prefix else '')
         self.chartmap = {}
         self.charts = []
         for key,value in tree.iteritems():
