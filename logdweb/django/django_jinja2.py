@@ -7,6 +7,7 @@
 
 """
 
+from datetime import datetime
 from logdweb.django import settings
 
 from jinja2 import FileSystemLoader, FileSystemBytecodeCache, Environment, \
@@ -24,6 +25,11 @@ loaders += [PackageLoader(app) for app in settings.INSTALLED_APPS]
 
 cache = FileSystemBytecodeCache(settings.JINJA_BYTECODE_CACHE_DIR, '%s.cache')
 
+def datetimeformat(value, format='%d %b %H:%M:%S'):
+    if isinstance(value, (long,int,float)):
+        value = datetime.fromtimestamp(value)
+    return value.strftime(format)
+
 env = Environment(
     extensions=settings.JINJA_EXTENSIONS,
     loader=ChoiceLoader(loaders),
@@ -34,6 +40,7 @@ env.globals.update({
     'reverse': reverse,
 })
 env.globals.update(__builtins__)
+env.filters['datetimeformat'] = datetimeformat
 
 for name in settings.JINJA_FILTERS:
     path = settings.JINJA_FILTERS[ name ]

@@ -2,7 +2,8 @@
 
 var viewSettings = {
   autoScroll: true,
-  update: true
+  update: true,
+  refreshCharts: true,
 };
 
 (function($) {
@@ -44,7 +45,7 @@ var viewSettings = {
     if (rows > lines) {
       /* chop the first rows - lines tr's */
       var num = rows - lines;
-      console.log("pruning " + num + "rows");
+      console.log(rows + "lines but max is " + lines + "; pruning " + num + " rows");
       $this.find('tr:lt(' + num + ')').remove();
     }
     return this;
@@ -83,7 +84,9 @@ var viewSettings = {
   }, 2000);
 
   setInterval(function() {
-    $('div.chart img').updateChart();
+    if (viewSettings.refreshCharts) {
+      $('div.chart img').updateChart();
+    }
   }, 10000);
 
   /* set up event handlers on load */
@@ -103,6 +106,39 @@ var viewSettings = {
       }
     });
 
+    $('.timers a').click(function(e) {
+      e.preventDefault();
+      var $this = $(this);
+      var opts = eval('('+$this.attr('change')+')');
+      $('div.chart img').alterChart(opts);
+      $('.timers a').removeClass('on');
+      $this.addClass('on');
+      return false;
+    });
+
+    $('#auto_refresh').click(function(e) {
+      e.preventDefault();
+      var $this = $(this);
+      viewSettings.refreshCharts = !$this.hasClass("on");
+      if (!viewSettings.refreshCharts) {
+        $this.removeClass("on").addClass("off");
+      } else {
+        $this.removeClass("off").addClass("on");
+      }
+    });
+
+    $('#contrast_mode').click(function(e) {
+      e.preventDefault();
+      var $this = $(this);
+      var on = $this.hasClass("on")
+      if (on) {
+        $this.html('&#x25a0;').removeClass("on");
+        $('div.chart img').alterChart({template: 'default'});
+      } else {
+        $this.html('&#x25a1;').addClass("on");
+        $('div.chart img').alterChart({template: 'plain'});
+      }
+    });
 
   });
 

@@ -92,3 +92,7 @@ div.log-container {
     overflow-y: auto;
     padding: 3px;
 }
+
+.clear { clear: both; }
+
+td.time { min-width: 25px; text-align: right; white-space: nowrap; }

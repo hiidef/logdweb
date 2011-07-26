@@ -6,12 +6,33 @@
 		div.chart img { 
 			box-shadow: 2px 2px 5px #aaa; 
 		}
-
 		div.chart {
 			margin-bottom: 2em;
 		}
+		h2 { margin-bottom: 2em; }
+		.controls { float: right; margin-top: -4em; }
+		.contrast, .refresh { font-size: 1.5em; }
+		.toggle, .on { color: black; }
+		.off { color: gray; text-shadow: 0 0 1px #ddd; }
+		.controls a:hover { text-decoration: none; }
 	</style>
 	<h2>{{ stat }} : {{ bucket }}</h2>
+	<div class="controls">
+		<span class="timers">
+		<a change="{from: '-1year'}" href="#">1y</a>
+		<a change="{from: '-1month'}" href="#">1m</a>
+		<a change="{from: '-2weeks'}" href="#">2w</a>
+		<a change="{from: '-1week'}" href="#">1w</a>
+		<a change="{from: '-3day'}" href="#">3d</a>
+		<a change="{from: '-1day'}" href="#">1d</a>
+		<a change="{from: '-12hours'}" href="#">12h</a>
+		<a change="{from: '-3hours'}" href="#">3h</a>
+		<a class="on" change="{from: '-1hour'}" href="#">1h</a>
+		<a change="{from: '-30minutes'}" href="#">30m</a>
+		</span>
+		<a id="auto_refresh" class="toggle refresh on" title="disable auto refresh" href="#">&#x27f2;</a>
+		<a id="contrast_mode" class="toggle contrast on" title="swap light/dark" href="#">&#x25a1;</a>
+	</div>
 	{{ render_charts(chart) }}
 {% endblock %}
 

@@ -16,6 +16,7 @@ urlpatterns = patterns('logdweb.django.views',
     (r'^stats/(?P<stat>[^/]+)/(?P<bucket>[^/]+)/?$', 'stats_chart', {}, 'logd-stat-chart'),
     # logs
     (r'^(?P<path>[^/]+)/?$', 'path_index', {}, 'logd-path-index'),
+    (r'^(?P<path>[^/]+)/line/(?P<line>\d+)', 'path_line', {}, 'logd-path-line'),
     (r'^(?P<path>[^/]+)/level/(?P<level>[^/]+)/?$', 'path_level', {}, 'logd-path-level'),
     (r'^(?P<path>[^/]+)/logger/(?P<logger>[^/]+)/?$', 'path_logger', {}, 'logd-path-logger'),
     (r'^(?P<path>[^/]+)/new/?$', 'path_new', {}, 'logd-path-new'),

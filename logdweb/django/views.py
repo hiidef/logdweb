@@ -23,9 +23,8 @@ def make_context(**kwargs):
 
 def index(request):
     logd = models.Logd()
-    graphite = models.Graphite()
     info = logd.server_info()
-    stats = graphite.get_stats()
+    stats = models.Graphite().get_stats()
     context = make_context(info=info, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
@@ -33,21 +32,32 @@ def path_index(request, path=""):
     logd = models.Logd()
     info = logd.server_info()
     lines = logd.get_lines(path)
-    context = make_context(info=info, path=path, lines=lines)
+    stats = models.Graphite().get_stats()
+    context = make_context(info=info, path=path, lines=lines, stats=stats)
+    return render_to_response('logdweb/index.jinja', context, request)
+
+def path_line(request, path, line):
+    logd = models.Logd()
+    info = logd.server_info()
+    line = logd.get_line(path, line)
+    stats = models.Graphite().get_stats()
+    context = make_context(info=info, path=path, lines=[line], stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_level(request, path="", level=""):
     logd = models.Logd()
     info = logd.server_info()
     lines = logd.get_level_lines(path, level)
-    context = make_context(info=info, path=path, level=level, lines=lines)
+    stats = models.Graphite().get_stats()
+    context = make_context(info=info, path=path, level=level, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_logger(request, path="", logger=""):
     logd = models.Logd()
     info = logd.server_info()
     lines = logd.get_logger_lines(path, logger)
-    context = make_context(info=info, path=path, logger=logger, lines=lines)
+    stats = models.Graphite().get_stats()
+    context = make_context(info=info, path=path, logger=logger, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_new(request, path="", level="", logger=""):

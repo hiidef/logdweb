@@ -54,6 +54,10 @@ class Logd(object):
         raw = reversed(r.sort(base, by='nosort', start=0, num=limit,
             get=['%s:*' % (base), '#']))
 
+    def get_line(self, path, line):
+        r = self.redis
+        key = '%s:log:%s:%s' % (logd, path, line)
+        return msgpack.loads(r.get(key))
 
     def get_lines(self, path, limit=50):
         r = self.redis
