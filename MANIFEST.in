@@ -1,2 +1,2 @@
-include README.rst LICENSE MANIFEST.in setup.py
+include README.rst LICENCE MANIFEST.in setup.py
 recursive-include logdweb/ *
