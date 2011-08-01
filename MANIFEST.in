@@ -1,4 +1,2 @@
-include README.rst
-include LICENSE
-include logdweb/templates
-include logdweb/static
+include README.rst LICENSE MANIFEST.in setup.py
+recursive-include logdweb/ *
