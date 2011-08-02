@@ -9,6 +9,7 @@
 
 from datetime import datetime
 from logdweb.django import settings
+from logdweb import util
 
 from jinja2 import FileSystemLoader, FileSystemBytecodeCache, Environment, \
     PackageLoader, ChoiceLoader
@@ -41,6 +42,7 @@ env.globals.update({
 })
 env.globals.update(__builtins__)
 env.filters['datetimeformat'] = datetimeformat
+env.filters['render_msg'] = util.render_msg
 
 for name in settings.JINJA_FILTERS:
     path = settings.JINJA_FILTERS[ name ]

@@ -9,7 +9,7 @@
 			<td class="logger">
 				<a href="{{ reverse('logd-path-logger', kwargs={'path': path, 'logger': line['name']}) }}">{{ line['name'] }}</a>
 			</td>
-			<td class="msg">{{ line['msg'] }}</td>
+			<td class="msg">{{ line['msg']|render_msg }}</td>
 		</tr>
 {%- endmacro %}
 

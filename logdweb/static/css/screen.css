@@ -18,6 +18,9 @@ body {
 
 a { color: #4183C4; text-decoration: none; text-shadow: 1px 1px 1px #fff; font-weight: bold; }
 a:hover { text-decoration: underline; }
+pre {
+    font-family: consolas, inconsolata, menlo, monaco, monospace; 
+}
 
 #header {
     height: 4.5em;
@@ -84,9 +87,6 @@ h2 { margin: 5px 0 20px 0; font-size: 16px; }
     font-size: 10px;
 }
 
-.log td { padding: 0 2px 0 2px; }
-td.hidden { display: none; }
-
 div.log-container {
     max-height: 700px;
     overflow-x: auto;
@@ -97,3 +97,6 @@ div.log-container {
 .clear { clear: both; }
 
 td.time { min-width: 25px; text-align: right; white-space: nowrap; }
+.log td { padding: 2px 3px; border-bottom: 1px solid #eee; }
+td.hidden { display: none; }
+
