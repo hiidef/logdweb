@@ -42,7 +42,7 @@ def path_line(request, path, line):
     info = logd.server_info()
     line = logd.get_line(path, line)
     stats = models.Graphite().get_stats()
-    context = make_context(info=info, path=path, lines=[line], stats=stats)
+    context = make_context(info=info, path=path, lines=[line], stats=stats, disable_update=True)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_level(request, path="", level=""):

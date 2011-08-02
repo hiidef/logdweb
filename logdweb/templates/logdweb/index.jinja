@@ -19,7 +19,7 @@
 				{% if names %}
 				<ul> {% for name in names %}
 					<li>
-						{% if logger and name == logger%}
+						{% if logger and name == logger %}
 							{{ name }}
 						{% else %}
 							<a href="{{ reverse('logd-path-logger', kwargs={'path': logfile['path'], 'logger': name}) }}">{{ name }}</a>
@@ -47,12 +47,18 @@
 {% block main %}
 	{% if path %}
 		<h2>{% if level or logger %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }}{% endif %}</h2>
-        <div class="log-container">
-            <table class="log" id="{{ path }}{% if level %}/level/{{level}}{%endif%}{%if logger %}/logger/{{logger}}{%endif%}">
-                {% for line in lines %}
-                    {{ lib.render_line(line, path) }}
-                {% endfor %}
-            </table>
-        </div>
+		<div class="log-container">
+			<table class="log" id="{{ path }}{% if level %}/level/{{level}}{%endif%}{%if logger %}/logger/{{logger}}{%endif%}">
+				{% for line in lines %}
+					{{ lib.render_line(line, path) }}
+				{% endfor %}
+			</table>
+    </div>
+	{% endif %}
+
+	{% if disable_update %}
+	<script type="text/javascript">
+		viewSettings.update = false;		
+	</script>
 	{% endif %}
 {% endblock %}
