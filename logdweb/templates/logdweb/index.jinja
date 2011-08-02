@@ -11,7 +11,22 @@
 		{% for logfile in info['logfiles'] %}
 			<li>
 			{% if path and path == logfile['path'] %}
-				{{ logfile['path'] }} ({{ logfile['length'] }})
+				{% if logger %}
+					<a href="{{ reverse('logd-path-index', kwargs={'path':logfile['path']}) }}">{{ logfile['path'] }}</a>
+				{% else %}
+					{{ logfile['path'] }}
+				{% endif %} ({{ logfile['length'] }})
+				{% if names %}
+				<ul> {% for name in names %}
+					<li>
+						{% if logger and name == logger%}
+							{{ name }}
+						{% else %}
+							<a href="{{ reverse('logd-path-logger', kwargs={'path': logfile['path'], 'logger': name}) }}">{{ name }}</a>
+						{% endif %}
+					</li>
+				{% endfor %}</ul>
+				{% endif %}
 			{% else %}
 				<a href="{{ reverse('logd-path-index', kwargs={'path':logfile['path']}) }}">{{ logfile['path'] }}</a>
 				({{ logfile['length'] }})

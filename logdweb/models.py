@@ -48,11 +48,10 @@ class Logd(object):
             logfiles.append(log)
         return {'logfiles': logfiles}
 
-    def get_keys(self, path, key, limit=50):
+    def get_loggers(self, path):
         r = self.redis
         base = '%s:log:%s' % (logd, path)
-        raw = reversed(r.sort(base, by='nosort', start=0, num=limit,
-            get=['%s:*' % (base), '#']))
+        return r.smembers(base + ':names')
 
     def get_line(self, path, line):
         r = self.redis

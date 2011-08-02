@@ -33,7 +33,8 @@ def path_index(request, path=""):
     info = logd.server_info()
     lines = logd.get_lines(path)
     stats = models.Graphite().get_stats()
-    context = make_context(info=info, path=path, lines=lines, stats=stats)
+    names = logd.get_loggers(path)
+    context = make_context(info=info, names=names, path=path, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_line(request, path, line):
@@ -57,7 +58,8 @@ def path_logger(request, path="", logger=""):
     info = logd.server_info()
     lines = logd.get_logger_lines(path, logger)
     stats = models.Graphite().get_stats()
-    context = make_context(info=info, path=path, logger=logger, lines=lines, stats=stats)
+    names = logd.get_loggers(path)
+    context = make_context(info=info, path=path, names=names, logger=logger, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_new(request, path="", level="", logger=""):

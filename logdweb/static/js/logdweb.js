@@ -30,7 +30,10 @@ var viewSettings = {
           }
           if (viewSettings.autoScroll) {
             $div.scrollTop($div[0].scrollHeight);
-            $this.truncateLog(1000);
+            $this.truncateLog(250);
+          } else {
+            // there is a maximum number of rows where the page gets unusable
+            $this.truncateLog(2000);
           }
         }
       });
