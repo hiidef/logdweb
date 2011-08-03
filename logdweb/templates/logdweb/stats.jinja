@@ -23,7 +23,7 @@
 			{% endfor %}
 			</ul></li>
 		{% elif not value %}
-			<li><a href="{{ reverse('logd-stat-chart', kwargs={'stat':name, 'bucket': '%s.%s' % (path, key)}) }}">{{ key }}</a></li
+			<li><a href="{{ reverse('logd-stat-chart', kwargs={'stat':name, 'bucket': '%s.%s' % (path, key)}) }}">{{ key }}</a></li>
 		{% else %}
 			<li>{{ key }}
 				{{ statsummary(value, name, path='%s.%s' % (path,key) if path else key) }}
