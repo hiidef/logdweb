@@ -16,12 +16,14 @@
 {% macro statsummary(d, name, path='') -%}
 	<ul>
 	{% for key,value in d.iteritems() %}
-		{% if isinstance(value, list) %}
+		{% if value and isinstance(value, list) %}
 			<li> <a href="{{ reverse('logd-stat-chart', kwargs={'stat': name, 'bucket': '%s.%s' % (path, key)}) }}">{{ key }}</a><ul>
 			{% for v in value %}
 			<li><a href="{{ reverse('logd-stat-chart', kwargs={'stat': name, 'bucket': "%s.%s.%s" % (path, key, v) }) }}">{{ v }}</a></li>
 			{% endfor %}
 			</ul></li>
+		{% elif not value %}
+			<li><a href="{{ reverse('logd-stat-chart', kwargs={'stat':name, 'bucket': '%s.%s' % (path, key)}) }}">{{ key }}</a></li
 		{% else %}
 			<li>{{ key }}
 				{{ statsummary(value, name, path='%s.%s' % (path,key) if path else key) }}
