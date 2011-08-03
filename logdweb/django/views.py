@@ -80,9 +80,9 @@ def stats_index(request, stat):
     graphite = models.Graphite()
     info = logd.server_info()
     stats = graphite.get_stats()
-    for stat in stats.keys():
-        for bucket in stats[stat].keys():
-            stats[stat][bucket] = models.stats_tree(stats[stat][bucket])
+    for key in stats.keys():
+        for bucket in stats[key].keys():
+            stats[key][bucket] = models.stats_tree(stats[key][bucket])
     context = make_context(info=info, stats=stats, stat=stat)
     return render_to_response('logdweb/stats.jinja', context, request)
 
