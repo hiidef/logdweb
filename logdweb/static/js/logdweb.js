@@ -8,8 +8,9 @@ var viewSettings = {
 
 (function($) {
   /* update a log, run on a table dom element */
-  $.fn.updateLog = function() {
+  $.fn.updateLog = function(opts) {
     var $this = $(this);
+    var config = $.extend({callback: function() {}}, opts);
     var path = $this.attr('id');
     if (!path) {
       return;
@@ -35,8 +36,13 @@ var viewSettings = {
             // there is a maximum number of rows where the page gets unusable
             $this.truncateLog(2000);
           }
+        },
+        complete: function() {
+          config.callback();
         }
       });
+    } else {
+      config.callback();
     }
     return this;
   };
@@ -82,9 +88,12 @@ var viewSettings = {
   };
 
   /* update the log once per second */
-  setInterval(function() {
-    $('table.log').updateLog();
-  }, 2000);
+  var updater = function() {
+    setTimeout(function() {
+      $('table.log').updateLog({callback: updater, timeout: 1000});
+    }, 1000);
+  };
+  updater();
 
   setInterval(function() {
     if (viewSettings.refreshCharts) {
