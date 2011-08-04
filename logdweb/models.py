@@ -82,7 +82,7 @@ class Logd(object):
         """Get new lines for a path and optional level/logger.  Only returns
         lines with an id newer than ``latest``."""
         r = self.redis
-        def get_lines(limit=20):
+        def get_lines(limit=200):
             if level:
                 lines = self.get_level_lines(path, level, limit=limit)
             elif logger:
@@ -93,7 +93,7 @@ class Logd(object):
         lines = get_lines()
         if lines[-1]['id'] > latest:
             diff = latest - lines[-1]['id']
-            diff += 50
+            diff += 100
             lines = get_lines(limit=diff)
         return [l for l in lines if l['id'] > latest]
 
