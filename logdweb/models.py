@@ -202,7 +202,7 @@ class Chart(object):
         final_targets = []
         for target in targets:
             final = '%s.%s' % (self.base, target)
-            func = 'alias(keepLastValue(cumulative(%s)),"%s")' % (final, target.rsplit('.',1)[1])
+            func = 'alias(keepLastValue(%s),"%s")' % (final, target.rsplit('.',1)[1])
             if 'timers' in self.base and target.endswith('mean'):
                 final_targets.insert(0, func)
             else:
