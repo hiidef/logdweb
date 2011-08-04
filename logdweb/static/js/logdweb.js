@@ -89,9 +89,10 @@ var viewSettings = {
 
   /* update the log once per second */
   var updater = function() {
+    console.log(new Date());
     setTimeout(function() {
-      $('table.log').updateLog({callback: updater, timeout: 1000});
-    }, 1000);
+      $('table.log').updateLog({callback: updater});
+    }, 2000);
   };
   updater();
 
