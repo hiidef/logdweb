@@ -31,14 +31,13 @@ logd = settings.LOGD_REDIS_PREFIX
 
 logger = logging.getLogger(__name__)
 
-class Logd(object):
-    def __init__(self):
-        self.redis = redis.Redis(settings.LOGD_REDIS_HOST,
-            settings.LOGD_REDIS_PORT)
+REDIS = redis.Redis(settings.LOGD_REDIS_HOST,
+    settings.LOGD_REDIS_PORT)
 
+class Logd(object):
     def server_info(self):
         """Return info about the server in general."""
-        r = self.redis
+        r = REDIS
         logfiles = []
         for path in list(sorted(r.smembers('%s:paths' % logd))):
             log = {
@@ -49,30 +48,30 @@ class Logd(object):
         return {'logfiles': logfiles}
 
     def get_loggers(self, path):
-        r = self.redis
+        r = REDIS
         base = '%s:log:%s' % (logd, path)
         return r.smembers(base + ':names')
 
     def get_line(self, path, line):
-        r = self.redis
+        r = REDIS
         key = '%s:log:%s:%s' % (logd, path, line)
         return msgpack.loads(r.get(key))
 
     def get_lines(self, path, limit=50):
-        r = self.redis
+        r = REDIS
         base = '%s:log:%s' % (logd, path)
         raw = reversed(r.sort(base, by='nosort', start=0, num=limit, get='%s:*' % base))
         return [msgpack.loads(r) for r in raw]
 
     def get_level_lines(self, path, level, limit=50):
-        r = self.redis
+        r = REDIS
         base = '%s:log:%s' % (logd, path)
         key = '%s:level:%s' % (base, level)
         raw = reversed(r.sort(key, desc=True, start=0, num=limit, get='%s:*' % base))
         return [msgpack.loads(r) for r in raw]
 
     def get_logger_lines(self, path, logger, limit=50):
-        r = self.redis
+        r = REDIS
         base = '%s:log:%s' % (logd, path)
         key = '%s:name:%s' % (base, logger)
         raw = reversed(r.sort(key, desc=True, start=0, num=limit, get='%s:*' % base))
@@ -81,7 +80,7 @@ class Logd(object):
     def get_new_lines(self, path, latest, level=None, logger=None):
         """Get new lines for a path and optional level/logger.  Only returns
         lines with an id newer than ``latest``."""
-        r = self.redis
+        r = REDIS
         def get_lines(limit=100):
             if level:
                 lines = self.get_level_lines(path, level, limit=limit)
