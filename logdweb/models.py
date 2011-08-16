@@ -117,31 +117,33 @@ class Graphite(object):
             if not key.startswith('stats'):
                 del stats[key]
         buckets = {}
+        def base():
+            return dict({'timers': {}, 'counts':{}, 'mcounts':{}, 'stats':{}, 'meters':{}})
         for key, stat in stats.items():
             if key.startswith('stats.timers'):
                 k = key.replace('stats.timers.', '')
                 prefix, timer = k.split(':')
-                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets.setdefault(prefix, base())
                 buckets[prefix]['timers'][timer] = stat
             elif key.startswith('stats.mcounts'):
                 k = key.replace('stats.mcounts.', '')
                 prefix, count = k.split(':')
-                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets.setdefault(prefix, base())
                 buckets[prefix]['mcounts'][count] = stat
             elif key.startswith('stats.counts'):
                 k = key.replace('stats.counts.', '')
                 prefix, count = k.split(':')
-                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets.setdefault(prefix, base())
                 buckets[prefix]['counts'][count] = stat
             elif key.startswith('stats.meters'):
                 k = key.replace('stats.meters.', '')
                 prefix, bucket = k.split(':')
-                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets.setdefault(prefix, base())
                 buckets[prefix]['meters'][bucket] = stat
             elif ':' in key:
                 k = key.replace('stats.', '')
                 prefix, bucket = k.split(':')
-                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets.setdefault(prefix, base())
                 buckets[prefix]['stats'][bucket] = stat
 
         # set for 30 seconds
