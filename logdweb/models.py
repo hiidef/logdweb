@@ -123,11 +123,21 @@ class Graphite(object):
                 prefix, timer = k.split(':')
                 buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
                 buckets[prefix]['timers'][timer] = stat
+            elif key.startswith('stats.mcounts'):
+                k = key.replace('stats.mcounts.', '')
+                prefix, count = k.split(':')
+                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets[prefix]['mcounts'][count] = stat
             elif key.startswith('stats.counts'):
                 k = key.replace('stats.counts.', '')
                 prefix, count = k.split(':')
                 buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
                 buckets[prefix]['counts'][count] = stat
+            elif key.startswith('stats.meters'):
+                k = key.replace('stats.meters.', '')
+                prefix, bucket = k.split(':')
+                buckets.setdefault(prefix, {'timers':{}, 'counts':{}, 'stats':{}})
+                buckets[prefix]['meters'][bucket] = stat
             elif ':' in key:
                 k = key.replace('stats.', '')
                 prefix, bucket = k.split(':')
