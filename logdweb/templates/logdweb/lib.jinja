@@ -6,6 +6,9 @@
 			<td class="level">
 			<a href="{{ reverse('logd-path-level', kwargs={'path':path, 'level': line['level']}) }}" class="{{ line['level'].lower() }}">{{ line['level'].lower()}}</a>
 			</td>
+			<td class="ip">
+				{{ line['ip'] }}
+			</td>
 			<td class="logger">
 				<a href="{{ reverse('logd-path-logger', kwargs={'path': path, 'logger': line['name']}) }}">{{ line['name'] }}</a>
 			</td>
