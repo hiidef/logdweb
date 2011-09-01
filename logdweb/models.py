@@ -186,6 +186,25 @@ def stats_tree(keys):
     reduce_tree(tree)
     return tree
 
+# these colors are from the Tomorrow-Theme:
+#  https://github.com/ChrisKempson/Tomorrow-Theme
+colors = {
+    'blue': '4271ae',
+    'green': '718c00',
+    'yellow': 'eab700',
+    'orange': 'f5871f',
+    'red': 'c82829',
+}
+
+color_map = {
+    'success': colors['green'],
+    'failure': colors['red'],
+    'negcache': colors['yellow'],
+    'hit': colors['green'],
+    'miss': colors['red'],
+    'flush': colors['blue'],
+}
+
 class Chart(object):
     defaults = {'width':700, 'height': 280}
     def __init__(self, tree, bucket, prefix, time='-1hours', template='plain'):
@@ -205,14 +224,7 @@ class Chart(object):
     def url(self, key, time=None, template=None):
         """Create a chart image URL for the key."""
         base = settings.LOGD_GRAPHITE_WEB_BASE
-        targets = list(sorted(self.chartmap[key], reverse=True))
-        if len(targets) == 2 and 'success' in targets:
-            if targets[1] != 'success':
-                targets = [targets[1], 'success']
-        if len(targets) == 3 and 'success' in targets:
-            if 'failure' in targets:
-                odd = set(targets) - set(['failure', 'success'])
-                targets = [odd, 'success', 'failure']
+        targets = list(sorted(self.chartmap[key]))
         kws = dict(self.defaults)
         time = time or self.time
         template = template or self.template
@@ -227,6 +239,8 @@ class Chart(object):
                 final_targets.append(func)
         kws['target'] = final_targets
         kws['title'] = key
+        if all([t in color_map for t in targets]):
+            kws['colorList'] = ','.join([color_map[t] for t in targets])
         return base + '/render/?%s' % urllib.urlencode(kws, doseq=True)
 
 
