@@ -206,6 +206,13 @@ class Chart(object):
         """Create a chart image URL for the key."""
         base = settings.LOGD_GRAPHITE_WEB_BASE
         targets = list(sorted(self.chartmap[key], reverse=True))
+        if len(targets) == 2 and 'success' in targets:
+            if targets[1] != 'success':
+                targets = [targets[1], 'success']
+        if len(targets) == 3 and 'success' in targets:
+            if 'failure' in targets:
+                odd = set(targets) - set(['failure', 'success'])
+                targets = [odd, 'success', 'failure']
         kws = dict(self.defaults)
         time = time or self.time
         template = template or self.template
