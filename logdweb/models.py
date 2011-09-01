@@ -189,9 +189,9 @@ def stats_tree(keys):
 # these colors are from the Tomorrow-Theme:
 #  https://github.com/ChrisKempson/Tomorrow-Theme
 colors = {
-    'blue': '4271ae',
-    'green': '718c00',
-    'yellow': 'eab700',
+    'blue': '5281be',
+    'green': '71dd00',
+    'yellow': 'fac700',
     'orange': 'f5871f',
     'red': 'c82829',
 }
@@ -199,7 +199,7 @@ colors = {
 color_map = {
     'success': colors['green'],
     'failure': colors['red'],
-    'negcache': colors['yellow'],
+    'negcache': colors['blue'],
     'hit': colors['green'],
     'miss': colors['red'],
     'flush': colors['blue'],
@@ -239,8 +239,9 @@ class Chart(object):
                 final_targets.append(func)
         kws['target'] = final_targets
         kws['title'] = key
-        if all([t in color_map for t in targets]):
-            kws['colorList'] = ','.join([color_map[t] for t in targets])
+        target_keys = [t.rsplit('.',1)[1] for t in targets]
+        if all([t in color_map for t in target_keys]):
+            kws['colorList'] = ','.join([color_map[t] for t in target_keys])
         return base + '/render/?%s' % urllib.urlencode(kws, doseq=True)
 
 
