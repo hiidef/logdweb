@@ -205,7 +205,7 @@ class Chart(object):
     def url(self, key, time=None, template=None):
         """Create a chart image URL for the key."""
         base = settings.LOGD_GRAPHITE_WEB_BASE
-        targets = list(sorted(self.chartmap[key]))
+        targets = list(sorted(self.chartmap[key], reverse=True))
         kws = dict(self.defaults)
         time = time or self.time
         template = template or self.template
