@@ -212,6 +212,7 @@ class Chart(object):
         if len(targets) == 3 and 'success' in targets:
             if 'failure' in targets:
                 odd = set(targets) - set(['failure', 'success'])
+                odd = odd[0]
                 targets = [odd, 'success', 'failure']
         kws = dict(self.defaults)
         time = time or self.time
