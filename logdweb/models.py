@@ -198,7 +198,7 @@ colors = {
 
 color_map = {
     'success': colors['green'],
-    'queuetimeout': colors['orange']
+    'queuetimeout': colors['orange'],
     'failure': colors['red'],
     'negcache': colors['blue'],
     'hit': colors['green'],
