@@ -11,11 +11,21 @@ from pygments.lexers import get_lexer_by_name
 
 tbre = re.compile('(?P<tb>Traceback \(most recent call last\):.*)', re.MULTILINE | re.DOTALL)
 
+def safe_unicode(s):
+    """Try to decode a string."""
+    try: return s.decode('utf-8')
+    except:
+        try: return s.decode('latin-1')
+        except:
+            try: return s.decode('utf-8', 'replace')
+            except: return u"(Unicode Decode Error)"
+
 def render_msg(msg):
     """Used on each message, can do things like escape html, linkify things,
     highlight tracebacks, etc."""
     if isinstance(msg, dict):
         msg = str(msg)
+    msg = safe_unicode(msg)
     msg = pygmentize_tb(msg)
     return msg
 
