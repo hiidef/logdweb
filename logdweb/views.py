@@ -8,32 +8,41 @@ try:
 except ImportError:
     import json
 
+import time
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 
 from django_jinja2 import render_to_response, render_to_string
-import models
+
+from logdweb import models
+from logdweb.settings import timer
 
 def make_context(**kwargs):
     global_context = {
         'logd_base_url' : reverse('logd-index'),
+        'timers': timer.timers,
     }
     global_context.update(kwargs)
     return global_context
 
 def index(request):
+    timer.start('page-generation')
     logd = models.Logd()
     info = logd.server_info()
     stats = models.Graphite().get_stats()
+    timer.end('page-generation')
     context = make_context(info=info, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_index(request, path=""):
+    timer.start('page-generation')
     logd = models.Logd()
     info = logd.server_info()
     lines = logd.get_lines(path)
     stats = models.Graphite().get_stats()
     names = logd.get_loggers(path)
+    timer.end('page-generation')
     context = make_context(info=info, names=names, path=path, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 

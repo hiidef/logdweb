@@ -96,4 +96,5 @@ def render_to_string(filename, context=None, request=None):
 def render_to_response(filename, context=None, request=None, mimetype=settings.DEFAULT_CONTENT_TYPE):
     """Render to response, similar to django's, but uses jinja."""
     rendered = render_to_string(filename, context, request)
+    settings.timer.clear()
     return HttpResponse(rendered,mimetype=mimetype)

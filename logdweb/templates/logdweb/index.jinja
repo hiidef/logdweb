@@ -61,4 +61,12 @@
 		viewSettings.update = false;		
 	</script>
 	{% endif %}
+
+	{% if timers %}
+		<p class="timers">
+			{% for name,val in timers.items() %}
+				{{ name }} : {{ "%0.3fs" % val }} <br />
+			{% endfor %}
+		</p>
+	{% endif %}
 {% endblock %}

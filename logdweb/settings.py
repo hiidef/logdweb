@@ -78,3 +78,7 @@ import pymongo
 
 logd_mongo = pymongo.Connection(LOGD_MONGO['host'], LOGD_MONGO['port'])[LOGD_MONGO['db']]
 
+import util
+
+timer = util.SimpleTimer()
+

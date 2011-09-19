@@ -4,12 +4,38 @@
 """ """
 
 import re
+import time
 
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
 tbre = re.compile('(?P<tb>Traceback \(most recent call last\):.*)', re.MULTILINE | re.DOTALL)
+
+class SimpleTimer(object):
+    def __init__(self):
+        self.timers = {}
+
+    def start(self, name):
+        self.timers[name] = time.time()
+
+    def end(self, name):
+        if name in self.timers:
+            self.timers[name] = time.time() - self.timers[name]
+
+    def timeit(self, key=None):
+        def wrapper(function):
+            name = key or function.__name__
+            def f(*args, **kwargs):
+                self.start(name)
+                ret = function(*args, **kwargs)
+                self.end(name)
+                return ret
+            return f
+        return wrapper
+
+    def clear(self):
+        self.timers = {}
 
 def safe_unicode(s):
     """Try to decode a string."""

@@ -8,6 +8,9 @@
 # now so we'll assume django
 
 from logdweb import settings
+cache = settings.cache
+timer = settings.timer
+db = settings.logd_mongo
 
 try:
     import simplejson as json
@@ -20,53 +23,69 @@ import urllib2
 
 logger = logging.getLogger(__name__)
 
+def mcsafe(key):
+    """Return a safe representation of some key."""
+    return key.encode('base64').replace('==\n', '')
+
+rev_natural = [('$natural', -1)]
+
 class Logd(object):
+    @timer.timeit('models.logd.server_info')
     def server_info(self):
         """Return info about the server in general."""
-        r = REDIS
-        logfiles = []
-        for path in list(sorted(r.smembers('%s:paths' % logd))):
-            log = {
-                'path': path,
-                'length': r.llen('%s:log:%s' % (logd, path)),
-            }
-            logfiles.append(log)
-        return {'logfiles': logfiles}
+        system_collections = ('system.indexes', 'config')
+        logfiles = [name for name in db.collection_names() if
+                name not in system_collections]
+        info = []
+        for l in logfiles:
+            linfo = db.command({"collstats": l})
+            linfo['path'] = l
+            linfo['length'] = linfo['count']
+            info.append(linfo)
+        return {'logfiles': info}
 
+    @timer.timeit('models.logd.get_loggers')
     def get_loggers(self, path):
-        r = REDIS
-        base = '%s:log:%s' % (logd, path)
-        return r.smembers(base + ':names')
+        """Return a list of the logger names on a logfile."""
+        cache_key = 'logd.%s.loggers' % mcsafe(path)
+        ret = cache.get(cache_key)
+        if ret:
+            return ret
+        ret = db[path].distinct('name')
+        # this can be relatively expensive (~500msec), so save it to a cache
+        # FIXME: we might want to keep a list of these in the config as we
+        # did before, so that this is always fast out of mongo
+        cache.set(cache_key, ret, 60)
+        return ret
 
+    @timer.timeit('models.logd.get_line')
     def get_line(self, path, line):
-        r = REDIS
-        key = '%s:log:%s:%s' % (logd, path, line)
-        return msgpack.loads(r.get(key))
+        # 'line' is no longer a monotonically increasing integer;  it's probably
+        # a mongo _id object
+        return {}
 
+    @timer.timeit('models.logd.get_lines')
     def get_lines(self, path, limit=50):
-        r = REDIS
-        base = '%s:log:%s' % (logd, path)
-        raw = reversed(r.sort(base, by='nosort', start=0, num=limit, get='%s:*' % base))
-        return [msgpack.loads(r) for r in raw if r]
+        log = db[path]
+        ret = list(log.find(sort=rev_natural).limit(limit))
+        return ret
 
+    @timer.timeit('models.logd.level_lines')
     def get_level_lines(self, path, level, limit=50):
-        r = REDIS
-        base = '%s:log:%s' % (logd, path)
-        key = '%s:level:%s' % (base, level)
-        raw = reversed(r.sort(key, desc=True, start=0, num=limit, get='%s:*' % base))
-        return [msgpack.loads(r) for r in raw if r]
+        log = db[path]
+        return list(log.find({'level': level}, sort=rev_natural).limit(limit))
 
+    @timer.timeit('models.logd.logger_lines')
     def get_logger_lines(self, path, logger, limit=50):
-        r = REDIS
-        base = '%s:log:%s' % (logd, path)
-        key = '%s:name:%s' % (base, logger)
-        raw = reversed(r.sort(key, desc=True, start=0, num=limit, get='%s:*' % base))
-        return [msgpack.loads(r) for r in raw if r]
+        log = db[path]
+        return list(log.find({'name': logger}, sort=rev_natural).limit(limit))
 
     def get_new_lines(self, path, latest, level=None, logger=None):
         """Get new lines for a path and optional level/logger.  Only returns
         lines with an id newer than ``latest``."""
-        r = REDIS
+        # 'line' is no longer a monotonically increasing integer;  it's probably
+        # a mongo _id object
+        return []
         def get_lines(limit=100):
             if level:
                 lines = self.get_level_lines(path, level, limit=limit)
@@ -81,9 +100,12 @@ class Logd(object):
 
 class Graphite(object):
     def __init__(self, webhost=None, webport=None):
-        self.host = webhost or settings.LOGD_GRAPHITE_WEB_HOST
-        self.port = webport or settings.LOGD_GRAPHITE_WEB_PORT
-        self.baseurl = 'http://%s:%s' % (self.host, self.port)
+        self.host = webhost or settings.LOGD_GRAPHITE_WEB['host']
+        self.port = webport or settings.LOGD_GRAPHITE_WEB['port']
+        if not any([webhost, webport]):
+            self.baseurl = settings.LOGD_GRAPHITE_WEB_URL
+        else:
+            self.baseurl = 'http://%s:%s' % (self.host, self.port)
 
     def render(self, **kwargs):
         pass
@@ -93,7 +115,7 @@ class Graphite(object):
         that graphite isn't clobbered, since getting the stats requires a
         disk read."""
         if usecache:
-            ret = settings.cache.get('logd.graphite.get_stats')
+            ret = cache.get('logd.graphite.get_stats')
             if ret:
                 return ret
         url = '%s/api/stats/list/' % self.baseurl
@@ -105,36 +127,40 @@ class Graphite(object):
         buckets = {}
         def base():
             return dict({'timers': {}, 'counts':{}, 'mcounts':{}, 'stats':{}, 'meters':{}})
+        def split_key(key):
+            if ':' not in key:
+                return 'default', key
+            return key.split(':')
         for key, stat in stats.items():
             if key.startswith('stats.timers'):
                 k = key.replace('stats.timers.', '')
-                prefix, timer = k.split(':')
+                prefix, timer = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['timers'][timer] = stat
             elif key.startswith('stats.mcounts'):
                 k = key.replace('stats.mcounts.', '')
-                prefix, count = k.split(':')
+                prefix, count = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['mcounts'][count] = stat
             elif key.startswith('stats.counts'):
                 k = key.replace('stats.counts.', '')
-                prefix, count = k.split(':')
+                prefix, count = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['counts'][count] = stat
             elif key.startswith('stats.meters'):
                 k = key.replace('stats.meters.', '')
-                prefix, bucket = k.split(':')
+                prefix, bucket = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['meters'][bucket] = stat
             elif ':' in key:
                 k = key.replace('stats.', '')
-                prefix, bucket = k.split(':')
+                prefix, bucket = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['stats'][bucket] = stat
 
         # set for 30 seconds
         if usecache:
-            settings.cache.set('logd.graphite.get_stats', buckets, 300)
+            cache.set('logd.graphite.get_stats', buckets, 300)
         return buckets
 
 def stats_tree(keys):
@@ -210,7 +236,7 @@ class Chart(object):
 
     def url(self, key, time=None, template=None):
         """Create a chart image URL for the key."""
-        base = settings.LOGD_GRAPHITE_WEB_BASE
+        base = settings.LOGD_GRAPHITE_WEB_URL
         targets = list(sorted(self.chartmap[key]))
         kws = dict(self.defaults)
         time = time or self.time
