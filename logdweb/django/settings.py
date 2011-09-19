@@ -43,3 +43,4 @@ try: os.makedirs(JINJA_BYTECODE_CACHE_DIR)
 except OSError: pass
 
 DEFAULT_CONTENT_TYPE = settings.DEFAULT_CONTENT_TYPE
+

@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Data models for logdweb.  These are general purpose abstractions over the
-redis data storage format for logd, which can be seen on its readme:
-
-    https://github.com/hiidef/logd
-
-These aren't really models, they are more like functions that return data
-from redis.
-"""
+"""Data models for logdweb."""
 
 # we can eventually have this attempt to get the right settings for the
 # environment, but running in a django context is most important for us

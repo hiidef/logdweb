@@ -35,6 +35,8 @@ setup(
     test_suite="tests",
     install_requires=[
       # -*- Extra requirements: -*-
+      "pymongo",
+      "jinja2",
     ],
     entry_points="""
     # -*- Entry points: -*-
