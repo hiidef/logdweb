@@ -8,8 +8,7 @@
 """
 
 from datetime import datetime
-from logdweb.django import settings
-from logdweb import util
+from logdweb import settings, util
 
 from jinja2 import FileSystemLoader, FileSystemBytecodeCache, Environment, \
     PackageLoader, ChoiceLoader

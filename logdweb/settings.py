@@ -23,6 +23,10 @@ def update(name, default):
     ret.update(getattr(settings, name, {}))
     return ret
 
+
+TEMPLATE_DIRS = default('TEMPLATE_DIRS', tuple())
+INSTALLED_APPS = default('INSTALLED_APPS', ('logdweb',))
+
 # some of these have defaults set by django
 
 LOGD_LOGD = update('LOGD_LOGD', {

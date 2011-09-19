@@ -7,9 +7,9 @@ import os
 from django.conf.urls.defaults import patterns
 
 moduledir = os.path.dirname(__file__)
-docroot = os.path.abspath(os.path.join(moduledir, '../static'))
+docroot = os.path.abspath(os.path.join(moduledir, './static'))
 
-urlpatterns = patterns('logdweb.django.views',
+urlpatterns = patterns('logdweb.views',
     (r'^$', 'index', {}, 'logd-index'),
     # stats
     (r'^stats/(?P<stat>[^/]+)/?$', 'stats_index', {}, 'logd-stat-index'),

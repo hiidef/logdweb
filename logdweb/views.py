@@ -11,8 +11,8 @@ except ImportError:
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 
-from logdweb.django.django_jinja2 import render_to_response, render_to_string
-from logdweb import models
+from django_jinja2 import render_to_response, render_to_string
+import models
 
 def make_context(**kwargs):
     global_context = {
