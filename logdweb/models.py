@@ -7,25 +7,18 @@
 # environment, but running in a django context is most important for us
 # now so we'll assume django
 
-from logdweb.django import settings
+from logdweb import settings
 
 try:
     import simplejson as json
 except:
     import json
 
-import redis
-import msgpack
 import logging
 import urllib
 import urllib2
 
-logd = settings.LOGD_REDIS_PREFIX
-
 logger = logging.getLogger(__name__)
-
-REDIS = redis.Redis(settings.LOGD_REDIS_HOST,
-    settings.LOGD_REDIS_PORT)
 
 class Logd(object):
     def server_info(self):

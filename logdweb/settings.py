@@ -1,37 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""logdweb settings"""
+"""Logdweb settings.
+
+The default settings for logdweb are listed here to make deploying this as the
+only django application a bit easier with the standard ``settings.py`` provided
+by ``django-admin.py``.
+"""
 
 import os
+
 from django.conf import settings
 from django.core.cache import cache
 
-TEMPLATE_DIRS = getattr(settings, 'TEMPLATE_DIRS', tuple())
-INSTALLED_APPS = getattr(settings, 'INSTALLED_APPS', tuple('logdweb'))
+def default(name, value):
+    return getattr(settings, name, value)
+
+def update(name, default):
+    """Update a default configuration dictionary with the values in the
+    customized version from settings.py"""
+    ret = default.copy()
+    ret.update(getattr(settings, name, {}))
+    return ret
 
 # some of these have defaults set by django
 
-LOGD_HOST = getattr(settings, 'LOGD_HOST', 'localhost')
-LOGD_PORT = getattr(settings, 'LOGD_PORT', 8126)
-LOGD_REDIS_HOST = getattr(settings, 'LOGD_REDIS_HOST', 'localhost')
-LOGD_REDIS_PORT = getattr(settings, 'LOGD_REDIS_PORT', 6379)
-LOGD_REDIS_PREFIX = getattr(settings, 'LOGD_REDIS_PREFIX', 'logd')
+LOGD_LOGD = update('LOGD_LOGD', {
+    'host': 'localhost',
+    'port': 8126,
+})
 
-LOGD_GRAPHITE_WEB_HOST = getattr(settings, 'LOGD_GRAPHITE_WEB_HOST', 'localhost')
-LOGD_GRAPHITE_WEB_PORT = getattr(settings, 'LOGD_GRAPHITE_WEB_PORT', 3333)
+LOGD_MONGO = update('LOGD_MONGO', {
+    'host': 'localhost',
+    'port': 27017,
+    'db': 'logd',
+})
 
-LOGD_GRAPHITE_WEB_BASE = "http://%s:%s" % (LOGD_GRAPHITE_WEB_HOST, LOGD_GRAPHITE_WEB_PORT)
+LOGD_GRAPHITE_WEB = update('LOGD_GRAPHITE_WEB', {
+    'host': 'localhost',
+    'port': 3333,
+})
+
+LOGD_GRAPHITE_WEB_URL = default('LOGD_GRAPHITE_WEB_URL',
+    "http://%(host)s:%(port)s" % LOGD_GRAPHITE_WEB)
 
 # jinja related;  these are not standard, but are pretty well adopted
 
-JINJA_CACHE_SIZE = getattr(settings, 'JINJA_CACHE_SIZE', 0)
-JINJA_BYTECODE_CACHE_DIR = getattr(settings, 'JINJA_BYTECODE_CACHE_DIR', None)
+JINJA_CACHE_SIZE = default('JINJA_CACHE_SIZE', 0)
+JINJA_BYTECODE_CACHE_DIR = default('JINJA_BYTECODE_CACHE_DIR', None)
 
-JINJA_EXTENSIONS = getattr(settings, 'JINJA_EXTENSIONS', tuple())
-JINJA_FILTERS = getattr(settings, 'JINJA_FILTERS', tuple())
-JINJA_TESTS = getattr(settings, 'JINJA_TESTS', tuple())
-JINJA_GLOBALS = getattr(settings, 'JINJA_GLOBALS', tuple())
+JINJA_EXTENSIONS = default('JINJA_EXTENSIONS', tuple())
+JINJA_FILTERS = default('JINJA_FILTERS', tuple())
+JINJA_TESTS = default('JINJA_TESTS', tuple())
+JINJA_GLOBALS = default('JINJA_GLOBALS', tuple())
+
+# attempt to set a jinja bytecode cache directory to shared mem
 
 if JINJA_BYTECODE_CACHE_DIR is None:
     if os.path.exists('/dev/shm/'):
@@ -43,4 +66,11 @@ try: os.makedirs(JINJA_BYTECODE_CACHE_DIR)
 except OSError: pass
 
 DEFAULT_CONTENT_TYPE = settings.DEFAULT_CONTENT_TYPE
+
+# create a database cursor here so it can be shared among views.
+# these cursors utilize a connection pool and are thread safe.
+
+import pymongo
+
+logd_mongo = pymongo.Connection(LOGD_MONGO['host'], LOGD_MONGO['port'])[LOGD_MONGO['db']]
 
