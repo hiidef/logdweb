@@ -44,48 +44,70 @@ class Logd(object):
             info.append(linfo)
         return {'logfiles': info}
 
+    @timer.timeit('models.logd.search')
+    def search(self, path, term, limit=50):
+        col = db[path]
+        if term.count('/') > 2: # assume it's a regex
+            term = term.strip('/')
+            lines = col.find({'msg': {'$regex': term}}, sort=rev_natural)
+        else:
+            lines = col.find({'msg': {'$regex': term}}, sort=rev_natural)
+        if limit:
+            lines = list(lines.limit(limit))
+        else:
+            lines = list(lines)
+        lines.reverse()
+        return lines
+
+    @timer.timeit('models.logd.path_info')
+    def path_info(self, path):
+        """Return info about a particular path."""
+        stats = db.command({'collstats': path})
+        stats[u'path'] = path
+        stats[u'length'] = stats[u'count']
+        config = db.config.find_one({'name': path})
+        stats[u'config'] = config
+        return stats
+
     @timer.timeit('models.logd.get_loggers')
     def get_loggers(self, path):
         """Return a list of the logger names on a logfile."""
-        cache_key = 'logd.%s.loggers' % mcsafe(path)
-        ret = cache.get(cache_key)
-        if ret:
-            return ret
-        ret = db[path].distinct('name')
-        # this can be relatively expensive (~500msec), so save it to a cache
-        # FIXME: we might want to keep a list of these in the config as we
-        # did before, so that this is always fast out of mongo
-        cache.set(cache_key, ret, 60)
-        return ret
+        loggers = db.config.find_one({'name':path}).get('loggers', [])
+        return list(sorted(loggers))
 
     @timer.timeit('models.logd.get_line')
     def get_line(self, path, line):
+        from pymongo import objectid
         # 'line' is no longer a monotonically increasing integer;  it's probably
         # a mongo _id object
-        return {}
+        return db[path].find_one({'_id': objectid.ObjectId(line)})
 
     @timer.timeit('models.logd.get_lines')
     def get_lines(self, path, limit=50):
         log = db[path]
         ret = list(log.find(sort=rev_natural).limit(limit))
+        ret = list(reversed(ret))
         return ret
 
     @timer.timeit('models.logd.level_lines')
     def get_level_lines(self, path, level, limit=50):
         log = db[path]
-        return list(log.find({'level': level}, sort=rev_natural).limit(limit))
+        ret = list(log.find({'level': level}, sort=rev_natural).limit(limit))
+        ret = list(reversed(ret))
+        return ret
 
     @timer.timeit('models.logd.logger_lines')
     def get_logger_lines(self, path, logger, limit=50):
         log = db[path]
-        return list(log.find({'name': logger}, sort=rev_natural).limit(limit))
+        ret = list(log.find({'name': logger}, sort=rev_natural).limit(limit))
+        ret = list(reversed(ret))
+        return ret
 
     def get_new_lines(self, path, latest, level=None, logger=None):
         """Get new lines for a path and optional level/logger.  Only returns
         lines with an id newer than ``latest``."""
-        # 'line' is no longer a monotonically increasing integer;  it's probably
-        # a mongo _id object
-        return []
+        # 'line' is no longer a monotonically increasing integer;  it's a str
+        # representation of a mongo ObjectID obj
         def get_lines(limit=100):
             if level:
                 lines = self.get_level_lines(path, level, limit=limit)
@@ -95,7 +117,13 @@ class Logd(object):
                 lines = self.get_lines(path, limit=limit)
             return lines
         lines = get_lines()
-        return [l for l in lines if l['id'] > latest]
+        ret = []
+        for l in reversed(lines):
+            if str(l['_id']) == latest:
+                return list(reversed(ret))
+            l['_id'] = str(l['_id'])
+            ret.append(l)
+        return list(reversed(ret))
 
 
 class Graphite(object):
@@ -110,6 +138,7 @@ class Graphite(object):
     def render(self, **kwargs):
         pass
 
+    @timer.timeit('graphite.get_stats')
     def get_stats(self, usecache=True):
         """Gets stats from Graphite.  These are cached for 30 seconds so
         that graphite isn't clobbered, since getting the stats requires a

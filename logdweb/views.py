@@ -11,7 +11,7 @@ except ImportError:
 import time
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 
 from django_jinja2 import render_to_response, render_to_string
 
@@ -46,12 +46,40 @@ def path_index(request, path=""):
     context = make_context(info=info, names=names, path=path, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
+
+def path_search(request, path):
+    term = request.GET.get('q', '')
+    if not term:
+        return HttpResponseRedirect(reverse('logd-path-index', kwargs={'path': path}))
+    limit = int(request.GET.get('limit', 50))
+    logd = models.Logd()
+    info = logd.server_info()
+    stats = models.Graphite().get_stats()
+    lines = logd.search(path, term, limit)
+    names = logd.get_loggers(path)
+    context = make_context(term=term, limit=limit, disable_update=True,
+            lines=lines, stats=stats, info=info, path=path, names=names)
+    return render_to_response('logdweb/index.jinja', context, request)
+
+def path_info(request, path=""):
+    timer.start('page-generation')
+    logd = models.Logd()
+    info = logd.server_info()
+    path_info = logd.path_info(path)
+    stats = models.Graphite().get_stats()
+    names = logd.get_loggers(path)
+    timer.end('page-generation')
+    context = make_context(info=info, path_info=path_info, names=names, path=path, stats=stats)
+    return render_to_response('logdweb/info.jinja', context, request)
+
 def path_line(request, path, line):
     logd = models.Logd()
     info = logd.server_info()
     line = logd.get_line(path, line)
     stats = models.Graphite().get_stats()
-    context = make_context(info=info, path=path, lines=[line], stats=stats, disable_update=True)
+    names = logd.get_loggers(path)
+    context = make_context(info=info, names=names, path=path,
+            lines=[line], details=True, stats=stats, disable_update=True)
     return render_to_response('logdweb/index.jinja', context, request)
 
 def path_level(request, path="", level=""):
@@ -74,7 +102,7 @@ def path_logger(request, path="", logger=""):
 def path_new(request, path="", level="", logger=""):
     """Fetch the new from a path."""
     try:
-        from_id = int(request.GET['id'])
+        from_id = str(request.GET['id'])
     except (ValueError, KeyError):
         raise Http404
     logd = models.Logd()
@@ -82,7 +110,8 @@ def path_new(request, path="", level="", logger=""):
     for line in new:
         line['rendered'] = render_to_string('logdweb/single_line.jinja',
             {'path':path, 'line':line})
-    return HttpResponse(json.dumps(new), mimetype='application/javascript')
+    response = json.dumps(new)
+    return HttpResponse(response, mimetype='application/javascript')
 
 def stats_index(request, stat):
     logd = models.Logd()

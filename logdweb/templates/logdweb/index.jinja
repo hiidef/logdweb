@@ -46,14 +46,26 @@
 
 {% block main %}
 	{% if path %}
-		<h2>{% if level or logger %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }}{% endif %}</h2>
+		<h2>{% if level or logger or details %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }} [ <a href="{{ reverse('logd-path-info', kwargs={'path': path}) }}">info</a> ]{% endif %}</h2>
+		<div class="search">
+			<form id="search-form" action="{{ reverse('logd-path-search', kwargs={'path': path}) }}" method="GET">
+				(limit: <input type="text" name="limit" maxlength="3" value="{{ limit or 50 }}" class="limit" />)
+				<input type="search" name="q" value="{{ term|e }}" /> <input type="submit" value="search" />
+			</form>
+		</div>
 		<div class="log-container">
+		{% if lines %}
 			<table class="log" id="{{ path }}{% if level %}/level/{{level}}{%endif%}{%if logger %}/logger/{{logger}}{%endif%}">
 				{% for line in lines %}
 					{{ lib.render_line(line, path) }}
 				{% endfor %}
 			</table>
+		{% endif %}
     </div>
+	{% endif %}
+
+	{% if details %}
+		{{ lib.render_details(lines[0], path) }}
 	{% endif %}
 
 	{% if disable_update %}
@@ -62,11 +74,6 @@
 	</script>
 	{% endif %}
 
-	{% if timers %}
-		<p class="timers">
-			{% for name,val in timers.items() %}
-				{{ name }} : {{ "%0.3fs" % val }} <br />
-			{% endfor %}
-		</p>
-	{% endif %}
+	{{ lib.show_timers(timers) }}
+
 {% endblock %}

@@ -15,7 +15,7 @@ var viewSettings = {
     if (!path) {
       return;
     }
-    var last_id = Number($(this).find('tr:last td.id').html());
+    var last_id = $(this).find('tr:last td.id').html();
     //console.log("Updating path " + path + " with last id " + last_id);
     var url = logd_base_url + path + '/new/?id=' + last_id;
     var $div = $this.closest('div.log-container');

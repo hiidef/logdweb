@@ -1,7 +1,7 @@
 
 {% macro render_line(line, path) -%}
 		<tr>
-			<td class="id hidden">{{ line['id'] }}</td>
+			<td class="id hidden">{{ str(line['_id']) }}</td>
 			<td class="time"><a href="{{ reverse('logd-path-line', kwargs={'path':path, 'line': str(line['_id'])}) }}">{{ line['time']|datetimeformat }}</a></td>
 			<td class="level">
 			<a href="{{ reverse('logd-path-level', kwargs={'path':path, 'level': line['level']}) }}" class="{{ line['level'].lower() }}">{{ line['level'].lower()}}</a>
@@ -16,3 +16,36 @@
 		</tr>
 {%- endmacro %}
 
+{% macro render_details(line, path) -%}
+		<div class="line-details">
+		<h3>details:</h3>
+			<ul>
+			{% for k,v in sorted(line.items()) %}
+			{% if k != id %}
+				<li><strong>{{ k if k != '_id' else 'id' }}:</strong> 
+				{% if k == '_id' %}
+					{{ str(v) }}
+				{% elif k == 'time' %}
+					{{ v }} ({{ v|datetimeformat }})
+				{% elif k in ('tb', 'msg') %}
+					{{ v | render_msg }}
+				{% else %}
+					{{ v }}
+				{% endif %}
+				</li>
+			{% endif %}
+			{% endfor %}
+			</ul>
+		</div>
+
+{%- endmacro %}
+
+{% macro show_timers(timers) -%}
+	{% if timers %}
+		<p class="timers">
+			{% for name,val in timers.items() %}
+				{{ name }} : {{ "%0.3fs" % val }} <br />
+			{% endfor %}
+		</p>
+	{% endif %}
+{%- endmacro %}
