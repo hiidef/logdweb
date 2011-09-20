@@ -96,7 +96,9 @@ def render_msg(msg):
         msg = pygmentize_tb(msg)
     else:
         msg = parse_dict_or_json(msg)
-    msg = url_re.sub(lambda x: '<a href="%s">%s</a>' % (x.group(0), trunc(x.group(0), 100)), msg)
+    msg = url_re.sub(lambda x: '<a href="%s">%s</a>' % (x.group(0).replace('&#39', ''), trunc(x.group(0), 100)), msg)
+    # hack to fix links that occur in parse_dict style code highlights
+    msg = msg.replace('&#39</a>;', '</a>\'')
     msg = msg.strip()
     return safe(msg)
 
