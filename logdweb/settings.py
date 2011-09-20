@@ -13,6 +13,9 @@ import os
 from django.conf import settings
 from django.core.cache import cache
 
+import logging
+logger = logging.getLogger("logdweb")
+
 def default(name, value):
     return getattr(settings, name, value)
 
@@ -80,7 +83,11 @@ DEFAULT_CONTENT_TYPE = settings.DEFAULT_CONTENT_TYPE
 
 import pymongo
 
-logd_mongo = pymongo.Connection(LOGD_MONGO['host'], LOGD_MONGO['port'])[LOGD_MONGO['db']]
+try:
+    logd_mongo = pymongo.Connection(LOGD_MONGO['host'], LOGD_MONGO['port'])[LOGD_MONGO['db']]
+except:
+    logd_mongo = None
+    logger.error("mongodb connection failed, logdweb will not work!")
 
 import util
 
