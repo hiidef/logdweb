@@ -37,6 +37,7 @@ setup(
       # -*- Extra requirements: -*-
       "pymongo",
       "jinja2",
+      "pygments",
     ],
     entry_points="""
     # -*- Entry points: -*-
