@@ -158,6 +158,7 @@ td.time {
 input.limit {
     width: 2.5em;
     box-sizing: content-box;
+    -moz-box-sizing: content-box;
 }
 
 .line-details pre {
@@ -198,4 +199,7 @@ input.limit {
 .line-details .source {
     font-size: 66%;
 }
+
+.timers a { color: #999; }
+.timer-info { display: none; }
 

@@ -50,7 +50,7 @@
 		<div class="search">
 			<form id="search-form" action="{{ reverse('logd-path-search', kwargs={'path': path}) }}" method="GET">
 				(limit: <input type="text" name="limit" maxlength="3" value="{{ limit or 50 }}" class="limit" />)
-				<input type="search" name="q" value="{{ term|e }}" /> <input type="submit" value="search" />
+				<input type="search" name="q" value="{{ term|e }}" /> <input type="submit" class="btn" value="search" />
 			</form>
 		</div>
 		<div class="log-container">

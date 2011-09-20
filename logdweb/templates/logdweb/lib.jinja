@@ -43,10 +43,21 @@
 
 {% macro show_timers(timers) -%}
 	{% if timers %}
+		<script type="text/javascript">
+			$(function() {
+				$("#show-timers").click(function(e) {
+					e.preventDefault();
+					$('.timer-info').toggle();
+				});
+			});
+		</script>
 		<div class="timers">
+			<a id="show-timers" href="#">page generation time</a>
+			<div class="timer-info">
 			{% for name,val in timers.items() %}
 				{{ name }} : {{ "%0.3fs" % val }} <br />
 			{% endfor %}
+			</div>
 		</div>
 	{% endif %}
 {%- endmacro %}
