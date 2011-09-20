@@ -19,6 +19,8 @@ from django.template import RequestContext
 from django.utils.importlib import import_module
 from django.http import HttpResponse
 
+from django.conf import settings as dsettings
+
 # logdweb should be an installed app, so the loader can find our templates
 loaders = [FileSystemLoader(path) for path in settings.TEMPLATE_DIRS]
 loaders += [PackageLoader(app) for app in settings.INSTALLED_APPS]
@@ -42,6 +44,8 @@ env.globals.update({
 env.globals.update(__builtins__)
 env.filters['datetimeformat'] = datetimeformat
 env.filters['render_msg'] = util.render_msg
+
+env.globals['settings'] = dsettings
 
 for name in settings.JINJA_FILTERS:
     path = settings.JINJA_FILTERS[ name ]

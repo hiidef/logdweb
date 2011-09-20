@@ -80,7 +80,7 @@ def path_line(request, path, line):
     names = logd.get_loggers(path)
     context = make_context(info=info, names=names, path=path,
             lines=[line], details=True, stats=stats, disable_update=True)
-    return render_to_response('logdweb/index.jinja', context, request)
+    return render_to_response('logdweb/info.jinja', context, request)
 
 def path_level(request, path="", level=""):
     logd = models.Logd()

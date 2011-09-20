@@ -1,27 +1,40 @@
- 
 
-* {
-  margin: 0;
-  padding: 0;
-  font-size: 1em;
-  text-decoration: none;
-  list-style: none;
+/* global styles */
+
+html, body {
+    font-family: "Myriad Web", Myriad, "Myriad Pro", "DejaVu Sans Condensed", Calibri, Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f9f9f9;
+    /* I don't like having scrollbars if I don't need them. */
+    overflow-y: auto;
 }
 
-body {
-    font-family: "Gill Sans", "Myriad Pro", Myriad, "DejaVu Sans Condensed", Calibri, Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #fbfbfb;
+a { 
+    color: #4183C4;
+    text-shadow: 1px 1px 1px #fff; 
+    font-weight: bold; 
+    text-decoration: none; 
 }
 
-a { color: #4183C4; text-decoration: none; text-shadow: 1px 1px 1px #fff; font-weight: bold; }
-a:hover { text-decoration: underline; }
-pre {
+a:hover { 
+    text-decoration: underline; 
+}
+
+h2 { 
+    margin: 5px 0 20px 0; 
+    font-size: 18px; 
+}
+
+code, pre {
     font-family: consolas, inconsolata, menlo, monaco, monospace; 
+    font-size: inherit;
+    line-height: inherit;
+    background-color: inherit;
 }
+
+/* groovy gray gradient header, a-la github */
 
 #header {
-    height: 4.5em;
-    padding-top: .5em;
+    height: 5em;
     border-bottom: 1px solid #fff;
     box-shadow: 0px 1px 0px #eee;
 
@@ -39,21 +52,31 @@ pre {
     );
 }
 
+#header h1 {
+    margin: 0;
+    padding: 0 0.5em;
+    font-size: 4em;
+    line-height: 1.5em;
+}
+
 #header h1 a { 
-    font-size: 3em;
-    margin: .5em;
-    text-shadow: 1px 1px 1px #fff;
     color: #222; 
+    text-shadow: 1px 1px 1px #fff;
+}
+
+#header h1 a:hover {
+    color: #555; 
+    text-shadow: 2px 2px 2px #fff; 
     text-decoration: none; 
 }
 
-#header h1 a:hover { color: #444; }
-
+/* "body" div style */
 #body {
     max-width: 1600;
     margin: 1em auto;
-    font-size: 14px;
 }
+
+/* sidebar styles;  these are somewhat stolen from django-sentry */
 
 #sidebar {
     float: right;
@@ -64,25 +87,23 @@ pre {
     background: inherit;
 }
 
+#sidebar h2 { text-decoration: underline; }
+#sidebar ul { margin: 1em 1em 1em 2em; }
+#sidebar ul li { list-style: circle; }
+#sidebar ul li ul { margin: 0em 0em 0em 1em; }
+
+/* main content pane */
+
 #main {
     background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 1px #c5c5c5;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px #c5c5c5;
     min-height: 700px;
     padding: 20px;
     margin: 2em 0 2em 2em;
     margin-right: 350px;
 }
 
-h2 { margin: 5px 0 20px 0; font-size: 16px; }
-#sidebar ul { margin: 1em 1em 1em 2em; }
-#sidebar ul li { list-style: circle; }
-#sidebar ul li ul { margin: 0em 0em 0em 1em; }
-
-.log { 
-    font-family: consolas, inconsolata, menlo, monaco, monospace; 
-    font-size: 10px;
-}
 
 div.log-container {
     max-height: 700px;
@@ -91,11 +112,36 @@ div.log-container {
     padding: 3px;
 }
 
-.clear { clear: both; }
+.log { 
+    font-family: consolas, inconsolata, menlo, monaco, monospace; 
+    font-size: 10px;
+    color: #111;
+}
 
-td.time { min-width: 25px; text-align: right; white-space: nowrap; }
-.log td { padding: 2px 3px; border-bottom: 1px solid #eee; }
-td.hidden { display: none; }
+/* log table border reset */
+.log { border: 0; }
+.log td { border: 0; border-bottom: 1px solid #eee; padding: 2px 3px; }
+.log tr { border: 0; }
+table th, table td { line-height: 13px; }
+
+/* highlighted code */
+.log pre, .log code {
+    border: 0;
+    margin: 3px 0;
+    padding: 3px;
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 2px #c5c5c5;
+    line-height: inherit;
+    background-color: #f9f9f9;
+}
+
+td.time { 
+    min-width: 25px; 
+    text-align: right; 
+    white-space: nowrap; 
+}
+
+.hidden { display: none; }
 
 .timers {
     color: #666;
@@ -106,12 +152,24 @@ td.hidden { display: none; }
 
 .search {
     float: right;
-    margin-top: -3em;
+    margin-top: -50px;
 }
 
 input.limit {
-    width: 2em;
-    border: 0;
+    width: 2.5em;
+    box-sizing: content-box;
+}
+
+.line-details pre {
+    background-color: #f9f9f9;
+    font-size: 12px;
+    line-height: 16px;
+    margin: 1em;
+}
+
+.line-details ul li strong {
+    display: inline-block;
+    min-width: 3em;
 }
 
 .line-details h3,
@@ -129,6 +187,7 @@ input.limit {
 .line-details ul li,
 .stats-container ul li {
     margin: 4px 0px;
+    color: #222;
 }
 
 .line-details {
