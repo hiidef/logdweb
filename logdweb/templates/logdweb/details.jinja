@@ -1,0 +1,20 @@
+{% extends "logdweb/index.jinja" %}
+{% import "logdweb/lib.jinja" as lib %}
+
+{% block main %}
+
+	<script type="text/javascript">
+		viewSettings.update = false;		
+	</script>
+
+	<h2><a href="{{ reverse('logd-path-index', kwargs={'path': path}) }}">{{ path }}</a>
+		[ <a href="{{ reverse('logd-path-info', kwargs={'path': path}) }}">info</a> ]</h2>
+
+	{{ lib.render_details(lines[0], path) }}
+
+	{% if settings.DEBUG %}
+		{{ lib.show_timers(timers) }}
+	{% endif %}
+
+{% endblock %}
+

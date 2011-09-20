@@ -2,19 +2,35 @@
 {% import "logdweb/lib.jinja" as lib %}
 
 {% block main %}
+	<h2><a href="{{ reverse('logd-path-index', kwargs={'path': path}) }}">{{ path }}</a></h2>
 
-	<script type="text/javascript">
-		viewSettings.update = false;		
-	</script>
+	{% set config = path_info['config'] %}
+	{% set options = config['options'] %}
 
-	<h2><a href="{{ reverse('logd-path-index', kwargs={'path': path}) }}">{{ path }}</a>
-		[ <a href="{{ reverse('logd-path-info', kwargs={'path': path}) }}">info</a> ]</h2>
-
-	{{ lib.render_details(lines[0], path) }}
+	<div class="stats-container">
+		<h3>stats:</h3>
+		<ul>
+			<li><strong>lines:</strong> {{ path_info['count'] }}</li>
+			<li><strong>size:</strong> {{ path_info['size']|filesizeformat }}</li>
+			<li><strong>size (storage):</strong> {{ path_info['storageSize']|filesizeformat }}</li>
+			<li><strong>size (indexes):</strong> {{ path_info['totalIndexSize']|filesizeformat }}</li>
+			<li><strong>average msg size:</strong> {{ int(path_info['avgObjSize'])|filesizeformat }}</li>
+			<li><strong># of loggers:</strong> {{ len(config['loggers']) }}</li>
+		</ul>
+		<h3>settings:</h3>
+		<ul>
+			<li><strong>options:</strong>
+				<ul>
+					{% for k,v in options.items() %}
+					<li><em>{{k}}</em>: {% if k == 'size' %}{{ v|filesizeformat }}{% else %}{{v}}{% endif %}</li>
+					{% endfor %}
+				</ul>
+			</li>
+		</ul>
+	</div>
 
 	{% if settings.DEBUG %}
 		{{ lib.show_timers(timers) }}
 	{% endif %}
 
 {% endblock %}
-

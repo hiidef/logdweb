@@ -75,7 +75,7 @@ def parse_dict_or_json(msg):
         elif c == '}':
             imbalance -= 1
     if start and end:
-        return ''.join(filter(None, [escape(msg[:start]), pygmentize(msg[start:end+1], 'python'), escape(msg[end+1:])]))
+        return ''.join(filter(None, [escape(msg[:start]), pygmentize(msg[start:end+1], 'python'), parse_dict_or_json((msg[end+1:]))]))
     return str(escape(msg))
 
 def render_msg(msg):
@@ -99,7 +99,6 @@ def render_msg(msg):
     msg = url_re.sub(lambda x: '<a href="%s">%s</a>' % (x.group(0), trunc(x.group(0), 100)), msg)
     msg = msg.strip()
     return safe(msg)
-
 
 def pygmentize_tb(msg):
     """Highlight tracebacks within a message."""
