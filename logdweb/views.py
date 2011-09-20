@@ -15,7 +15,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 
 from django_jinja2 import render_to_response, render_to_string
 
-from logdweb import models
+from logdweb import models, settings
 from logdweb.settings import timer
 
 from functools import wraps

@@ -29,7 +29,7 @@ INSTALLED_APPS = default('INSTALLED_APPS', ('logdweb',))
 
 # by default, logd access requires superuser privs
 
-LOGD_REQUIRE_SUPERUSER = True
+LOGD_REQUIRE_SUPERUSER = default('LOGD_REQUIRE_SUPERUSER', True)
 
 # some of these have defaults set by django
 
