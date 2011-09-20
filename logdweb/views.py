@@ -18,6 +18,22 @@ from django_jinja2 import render_to_response, render_to_string
 from logdweb import models
 from logdweb.settings import timer
 
+from functools import wraps
+from django.contrib.auth.decorators import login_required
+
+def superuser_required(view):
+    if settings.LOGD_REQUIRE_SUPERUSER:
+        @wraps(view)
+        @login_required
+        def wrapped(request, *args, **kwargs):
+            if not request.user.is_superuser:
+                try: login_url = reverse('django.contrib.auth.views.login')
+                except: login_url = u'/'
+                return HttpResponseRedirect(login_url)
+            return view(request, *args, **kwargs)
+        return wrapped
+    return login_required(view)
+
 def make_context(**kwargs):
     global_context = {
         'logd_base_url' : reverse('logd-index'),
@@ -26,6 +42,7 @@ def make_context(**kwargs):
     global_context.update(kwargs)
     return global_context
 
+@require_superuser
 def index(request):
     timer.start('page-generation')
     logd = models.Logd()
@@ -35,6 +52,7 @@ def index(request):
     context = make_context(info=info, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
+@require_superuser
 def path_index(request, path=""):
     timer.start('page-generation')
     logd = models.Logd()
@@ -46,7 +64,7 @@ def path_index(request, path=""):
     context = make_context(info=info, names=names, path=path, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
-
+@require_superuser
 def path_search(request, path):
     term = request.GET.get('q', '')
     if not term:
@@ -61,6 +79,7 @@ def path_search(request, path):
             lines=lines, stats=stats, info=info, path=path, names=names)
     return render_to_response('logdweb/index.jinja', context, request)
 
+@require_superuser
 def path_info(request, path=""):
     timer.start('page-generation')
     logd = models.Logd()
@@ -72,6 +91,7 @@ def path_info(request, path=""):
     context = make_context(info=info, path_info=path_info, names=names, path=path, stats=stats)
     return render_to_response('logdweb/info.jinja', context, request)
 
+@require_superuser
 def path_line(request, path, line):
     logd = models.Logd()
     info = logd.server_info()
@@ -82,6 +102,7 @@ def path_line(request, path, line):
             lines=[line], details=True, stats=stats, disable_update=True)
     return render_to_response('logdweb/details.jinja', context, request)
 
+@require_superuser
 def path_level(request, path="", level=""):
     logd = models.Logd()
     info = logd.server_info()
@@ -90,6 +111,7 @@ def path_level(request, path="", level=""):
     context = make_context(info=info, path=path, level=level, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
+@require_superuser
 def path_logger(request, path="", logger=""):
     logd = models.Logd()
     info = logd.server_info()
@@ -99,6 +121,7 @@ def path_logger(request, path="", logger=""):
     context = make_context(info=info, path=path, names=names, logger=logger, lines=lines, stats=stats)
     return render_to_response('logdweb/index.jinja', context, request)
 
+@require_superuser
 def path_new(request, path="", level="", logger=""):
     """Fetch the new from a path."""
     try:
@@ -113,6 +136,7 @@ def path_new(request, path="", level="", logger=""):
     response = json.dumps(new)
     return HttpResponse(response, mimetype='application/javascript')
 
+@require_superuser
 def stats_index(request, stat):
     logd = models.Logd()
     graphite = models.Graphite()
@@ -124,6 +148,7 @@ def stats_index(request, stat):
     context = make_context(info=info, stats=stats, stat=stat)
     return render_to_response('logdweb/stats.jinja', context, request)
 
+@require_superuser
 def stats_chart(request, stat, bucket):
     time = request.GET.get('time', '-1hours')
     template = request.GET.get('template', 'plain')
