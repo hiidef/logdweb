@@ -23,10 +23,6 @@ import urllib2
 
 logger = logging.getLogger(__name__)
 
-def mcsafe(key):
-    """Return a safe representation of some key."""
-    return key.encode('base64').replace('==\n', '')
-
 rev_natural = [('$natural', -1)]
 
 class Logd(object):

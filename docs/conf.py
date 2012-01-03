@@ -37,7 +37,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'logdweb'
-copyright = u'2010 Jason Moiron'
+copyright = u'2011, HiiDef'
 
 # The short X.Y version.
 version = '0.1'
@@ -75,7 +75,7 @@ exclude_trees = ['_build']
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'vs'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -86,8 +86,13 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 #html_theme = 'default'
-html_theme = 'nature'
+html_theme = 'logd'
 html_theme_path = ['_theme']
+html_theme_options = {
+    'github_fork': 'hiidef/logdweb',
+}
+
+html_logo = None
 #html_theme_options = {}
 
 # The name for this set of Sphinx documents.  If None, it defaults to
