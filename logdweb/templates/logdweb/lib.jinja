@@ -62,6 +62,48 @@
 	{% endif %}
 {%- endmacro %}
 
+{% macro sidebar_dashboard() %}
+	<h2><a href="{{ reverse("logd-dashboard") }}">dashboard</a></h2>
+	<ul>
+		<li><a href="{{ reverse("logd-config") }}">config</a></li>
+	</ul>
+{% endmacro %}
+
+{% macro sidebar_logfiles(logfiles, current_path=none, loggers=none, current_logger=none) %}
+	<h2>logs</h2>
+	<ul>
+		{% for log in logfiles %}
+			<li>
+			{% if log['path'] != current_path or current_logger %}
+				<a href="{{ reverse("logd-path-index", kwargs={'path': log['path']}) }}">{{ log['path'] }}</a> ({{ log['length'] }})
+			{% else %}
+				{{ log['path'] }} ({{ log['length'] }})
+			{% endif %}
+			{% if loggers and log['path'] == current_path %}
+				<ul>{% for logger in loggers %}
+					<li>
+						{% if logger == current_logger %}
+							{{ logger }}
+						{% else %}
+							<a href="{{ reverse("logd-path-logger", kwargs={'path': log['path'], 'logger': logger}) }}">{{ logger }}</a>
+						{% endif %}
+					</li>{% endfor %}
+				</ul>
+			{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+{% endmacro %}
+
+{% macro sidebar_stats(stats) %}
+	<h2>stats</h2>
+	<ul>
+		{% for stat in stats %}
+			<li><a href="{{ reverse('logd-stat-index', kwargs={'stat': stat}) }}">{{ stat }}</a>
+		{% endfor %}
+	</ul>
+{% endmacro %}
+
 {% macro delete_confirm_modal(path) -%}
   <div id="{{ path|jsclass }}-confirm-delete" class="modal" style="display: none;">
     <div class="modal-header">

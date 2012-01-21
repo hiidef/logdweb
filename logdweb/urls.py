@@ -11,6 +11,11 @@ docroot = os.path.abspath(os.path.join(moduledir, './static'))
 
 urlpatterns = patterns('logdweb.views',
     (r'^$', 'index', {}, 'logd-index'),
+
+    # dashboard
+    (r'^dashboard/?$', 'dashboard_index', {}, 'logd-dashboard'),
+    # config
+    (r'^config/?$', 'config_index', {}, 'logd-config'),
     # stats
     (r'^stats/(?P<stat>[^/]+)/?$', 'stats_index', {}, 'logd-stat-index'),
     (r'^stats/(?P<stat>[^/]+)/(?P<bucket>[^/]+)/?$', 'stats_chart', {}, 'logd-stat-chart'),
