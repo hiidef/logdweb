@@ -61,3 +61,20 @@
 		</div>
 	{% endif %}
 {%- endmacro %}
+
+{% macro delete_confirm_modal(path) -%}
+  <div id="{{ path|jsclass }}-confirm-delete" class="modal" style="display: none;">
+    <div class="modal-header">
+      <a href="#" class="close">x</a>
+      <h3>Permanently delete {{ path }}?</h3>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to permanently delete {{ path }}?</p>
+    </div>
+    <div class="modal-footer">
+      <a href="{{ reverse("logd-path-delete", kwargs={'path': path}) }}" class="btn danger">Delete</a>
+      <a href="#" class="btn default cancel">Cancel</a>
+    </div>
+  </div>
+{%- endmacro %}
+

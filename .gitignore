@@ -7,4 +7,5 @@ build
 dist
 *.swp
 *.swo
+*.swn
 tags

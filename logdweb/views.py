@@ -112,6 +112,15 @@ def path_level(request, path="", level=""):
     return render_to_response('logdweb/index.jinja', context, request)
 
 @superuser_required
+def path_delete(request, path=""):
+    from pylogd import delete_log
+    delete_log(path, settings.LOGD_LOGD['host'], settings.LOGD_LOGD['port'])
+    # to increase the likelihood that the UDP message will "get there" by the
+    # time that the next page is loaded and the log will be deleted, we sleep
+    time.sleep(0.25)
+    return HttpResponseRedirect(reverse('logd-index'))
+
+@superuser_required
 def path_logger(request, path="", logger=""):
     logd = models.Logd()
     info = logd.server_info()

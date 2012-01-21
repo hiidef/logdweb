@@ -119,3 +119,7 @@ def pygmentize(code, lang=None, cssclass='source'):
     highlighted = highlight(code, lexer, formatter)
     return highlighted
 
+def jsclass(text):
+    """Make some text safe for use in a javascript class."""
+    return re.sub('[^\-A-Za-z0-9_]', '', text)
+

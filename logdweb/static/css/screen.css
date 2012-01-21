@@ -2,7 +2,6 @@
 /* global styles */
 
 html, body {
-    font-family: "Myriad Web", Myriad, "Myriad Pro", "DejaVu Sans Condensed", Calibri, Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: #f9f9f9;
     /* I don't like having scrollbars if I don't need them. */
     overflow-y: auto;
@@ -14,6 +13,15 @@ a {
     font-weight: bold; 
     text-decoration: none; 
 }
+
+a.label { text-shadow: none; }
+a.label:hover {
+    text-decoration: none;
+    color: white;
+}
+a.label.important:hover { background-color: #943915; }
+a.label.info { background-color: #0064CD; }
+a.label.info:hover { background-color: #00349d; }
 
 a:hover { 
     text-decoration: underline; 
@@ -87,7 +95,7 @@ code, pre {
     background: inherit;
 }
 
-#sidebar h2 { text-decoration: underline; }
+#sidebar h2 { text-decoration: underline; margin-bottom: 10px; }
 #sidebar ul { margin: 1em 1em 1em 2em; }
 #sidebar ul li { list-style: circle; }
 #sidebar ul li ul { margin: 0em 0em 0em 1em; }

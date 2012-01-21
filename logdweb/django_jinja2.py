@@ -44,6 +44,7 @@ env.globals.update({
 env.globals.update(__builtins__)
 env.filters['datetimeformat'] = datetimeformat
 env.filters['render_msg'] = util.render_msg
+env.filters['jsclass'] = util.jsclass
 
 env.globals['settings'] = dsettings
 

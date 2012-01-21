@@ -151,7 +151,14 @@ var viewSettings = {
         $('div.chart img').alterChart({template: 'plain'});
       }
     });
+  
+    $('.modal .cancel').click(function(e) {
+      e.preventDefault();
+      var modal = $(this).parents('.modal');
+      $(modal).modal('hide');
+    });
 
   });
+  
 
 })(jQuery);

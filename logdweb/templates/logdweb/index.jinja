@@ -46,13 +46,22 @@
 
 {% block main %}
 	{% if path %}
-		<h2>{% if level or logger or details %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }} [ <a href="{{ reverse('logd-path-info', kwargs={'path': path}) }}">info</a> ]{% endif %}</h2>
+    {{ lib.delete_confirm_modal(path) }}
+
+		<h2>{% if level or logger or details %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }}
+      <span class="log-labels">
+        <a class="label info" href="{{ reverse('logd-path-info', kwargs={'path': path}) }}">info</a>
+        <a class="label important" data-controls-modal="{{ path|jsclass}}-confirm-delete" data-backdrop="true" data-keyboard="true" href="#">delete</a>
+      </span>
+    {% endif %}
+    </h2>
 		<div class="search">
 			<form id="search-form" action="{{ reverse('logd-path-search', kwargs={'path': path}) }}" method="GET">
 				(limit: <input type="text" name="limit" maxlength="3" value="{{ limit or 50 }}" class="limit" />)
 				<input type="search" name="q" value="{{ term|e }}" /> <input type="submit" class="btn" value="search" />
 			</form>
 		</div>
+
 		<div class="log-container">
 		{% if lines %}
 			<table class="log" id="{{ path }}{% if level %}/level/{{level}}{%endif%}{%if logger %}/logger/{{logger}}{%endif%}">
