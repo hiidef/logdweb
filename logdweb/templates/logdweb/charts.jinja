@@ -3,12 +3,6 @@
 
 {% block main %}
 	<style type="text/css">
-		div.chart img { 
-			box-shadow: 2px 2px 5px #aaa; 
-		}
-		div.chart {
-			margin-bottom: 2em;
-		}
 		h2 { margin-bottom: 2em; }
 		.controls { float: right; margin-top: -4em; }
 		.contrast, .refresh { font-size: 1.5em; }
@@ -39,7 +33,11 @@
 {% macro render_charts(chart) -%}
 	{% for key,data in chart.chartmap.iteritems() %}
 		<div class="chart">
-			<img src="{{ chart.url(key) }}" alt="{{ key }}" />
+			<div class="chart-container">
+				<div class="left overlay"><a href="#">&lt;</a></div>
+				<img src="{{ chart.url(key) }}" alt="{{ key }}" id="{{ key|jsclass }}" />
+				<div class="right overlay"><a href="#">&gt;</a></div>
+			</div>
 		</div>
 	{% endfor %}
 {%- endmacro %}

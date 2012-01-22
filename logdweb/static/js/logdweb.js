@@ -4,7 +4,34 @@ var viewSettings = {
   autoScroll: true,
   update: true,
   refreshCharts: true,
+  timeStep: "-1hours"
 };
+
+/* given two strings like -1hours or -1week (in the same units), return the
+ * result of adding them together.
+ */
+function addFuzzyTime(t1, t2) {
+  if (typeof(t2) == "undefined") {
+    return t1;
+  }
+  var t1int = parseInt(t1);
+  var t2int = parseInt(t2);
+  var units = t1.replace(t1int, "");
+
+  return (t1int + t2int).toString() + units;
+}
+
+/* given two strings like -1hours or -1week, subtract t2 from t1 */
+function subFuzzyTime(t1, t2) {
+  if (typeof(t2) == "undefined") {
+    return t1;
+  }
+  var t1int = parseInt(t1);
+  var t2int = parseInt(t2);
+  var units = t1.replace(t1int, "");
+
+  return (t1int - t2int).toString() + units;
+}
 
 (function($) {
   /* update a log, run on a table dom element */
@@ -75,9 +102,15 @@ var viewSettings = {
     $.each(this, function() {
       var src = this.src;
       for (var key in opts) {
+        var val = opts[key];
         var re = new RegExp(key + "=[^&]+");
         if ( src.match(re) ) {
-          src = src.replace(new RegExp(key + "=[^&]+"), key + '=' + opts[key]);
+          if (val != false) {
+            src = src.replace(new RegExp(key + "=[^&]+"), key + '=' + opts[key]);
+          } else {
+            /* if val is false, remove it */
+            src = src.replace(new RegExp(key + "=[^&]+"), "");
+          }
         } else {
           src += '&' + key + '=' + opts[key];
         }
@@ -85,6 +118,28 @@ var viewSettings = {
       this.src = src
     });
     return this;
+  };
+
+  /* return an object representing the current chart options */
+  $.fn.chartOptions = function() {
+    var opts = {};
+    var re = new RegExp("\s=[^&]+");
+    var src = this[0].src;
+    var qs = src.slice(src.indexOf('?')+1);
+    var keyvals = qs.match(/(\w+=[^&]+)+/g);
+    $.each(qs.match(/(\w+=[^&]+)+/g), function() {
+      var keyvals = this.match(/([^=]+)=(.+)/);
+      var key = keyvals[1], val=keyvals[2];
+      if (key in opts && typeof(opts[key]) != "object") {
+        opts[key] = [opts[key]];
+      }
+      if (key in opts) {
+        opts[key][opts[key].length] = val;
+      } else {
+        opts[key] = val;
+      }
+    });
+    return opts;
   };
 
   /* update the log once per second */
@@ -122,6 +177,7 @@ var viewSettings = {
       e.preventDefault();
       var $this = $(this);
       var opts = eval('('+$this.attr('change')+')');
+      viewSettings.timeStep = opts.from;
       $('div.chart img').alterChart(opts);
       $('.timers a').removeClass('on');
       $this.addClass('on');
@@ -156,6 +212,36 @@ var viewSettings = {
       e.preventDefault();
       var modal = $(this).parents('.modal');
       $(modal).modal('hide');
+    });
+
+    $('.left.overlay a').click(function(e) {
+      e.preventDefault();
+      var $chart = $(this).parents(".chart-container").find("img");
+      var opts = $chart.chartOptions();
+      var from = addFuzzyTime(opts.from, viewSettings.timeStep);
+      if ("until" in opts) {
+        var until = addFuzzyTime(opts.until, viewSettings.timeStep);
+      } else {
+        var until = viewSettings.timeStep;
+      }
+
+      $chart.alterChart({from: from, until: until});
+
+    });
+
+    $('.right.overlay a').click(function(e) {
+      e.preventDefault();
+      var $chart = $(this).parents(".chart-container").find("img");
+      var opts = $chart.chartOptions();
+      var from = subFuzzyTime(opts.from, viewSettings.timeStep);
+      if ("until" in opts) {
+        var until = subFuzzyTime(opts.until, viewSettings.timeStep);
+      } else {
+        return;
+      }
+      if( parseInt(from) == 0 ) { return; }
+      if( parseInt(until) == 0 ) { until = false; }
+      $chart.alterChart({from: from, until: until});
     });
 
   });

@@ -82,7 +82,7 @@ code, pre {
 
 /* "body" div style */
 #body {
-    max-width: 1600;
+    max-width: 1600px;
     margin: 1em auto;
 }
 
@@ -109,6 +109,7 @@ code, pre {
     border-radius: 5px;
     box-shadow: 1px 1px 3px #c5c5c5;
     min-height: 700px;
+    min-width: 750px;
     padding: 20px;
     margin: 2em 0 2em 2em;
     margin-right: 350px;
@@ -212,4 +213,37 @@ input.limit {
 
 .timers a { color: #999; }
 .timer-info { display: none; }
+
+div.chart {
+    box-shadow: 1px 1px 5px #aaa;
+    margin-bottom: 2em;
+    position: relative;
+    text-align: center;
+}
+
+.chart-container {
+    width: 730px;
+    margin: 0 auto;
+    position: relative;
+}
+
+div.chart img {
+}
+
+div.overlay a {
+    height: 145px;
+    width: 15px;
+    display: block;
+    padding-top: 135px;
+    text-align: center;
+}
+div.overlay a:hover {
+    background-color: rgba(230, 230, 230, 0.5); 
+    text-decoration: none;
+}
+div.overlay { 
+    position: absolute;
+}
+div.overlay.left { top: 0; left: 0; }
+div.overlay.right { top: 0; left: 715px; }
 
