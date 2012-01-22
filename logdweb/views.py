@@ -150,10 +150,11 @@ def path_new(request, path="", level="", logger=""):
 @superuser_required
 def stats_index(request, stat):
     graphite = models.Graphite()
+    stats = models.Graphite().get_stats()
     for key in stats.keys():
         for bucket in stats[key].keys():
             stats[key][bucket] = models.stats_tree(stats[key][bucket])
-    context = make_context(stat=stat)
+    context = make_context(stats=stats, stat=stat)
     return render_to_response('logdweb/stats.jinja', context, request)
 
 @superuser_required
@@ -162,6 +163,7 @@ def stats_chart(request, stat, bucket):
     template = request.GET.get('template', 'plain')
     graphite = models.Graphite()
     pref, bucket = bucket.split('.', 1)
+    stats = models.Graphite().get_stats()
     chart = dict([(k,v) for k,v in stats[stat][pref].items() if k.startswith(bucket)])
     chart = models.Chart(chart, stat, pref, time=time, template=template)
     context = make_context(stat=stat, bucket=bucket, chart=chart)
