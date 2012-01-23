@@ -226,34 +226,34 @@ def stats_tree(keys):
 # these colors are from the Tomorrow-Theme:
 #  https://github.com/ChrisKempson/Tomorrow-Theme
 colors = {
-    'blue': '5281be',
-    'green': '71dd00',
-    'yellow': 'fac700',
-    'orange': 'f5871f',
-    'red': 'c82829',
+    "blue": "5281be",
+    "green": "71dd00",
+    "yellow": "fac700",
+    "orange": "f5871f",
+    "red": "c82829",
 }
 
 color_map = {
-    'success': colors['green'],
-    'queuetimeout': colors['orange'],
-    'failure': colors['red'],
-    'negcache': colors['blue'],
-    'hit': colors['green'],
-    'miss': colors['red'],
-    'flush': colors['blue'],
+    "success": colors["green"],
+    "queuetimeout": colors["orange"],
+    "failure": colors["red"],
+    "negcache": colors["blue"],
+    "hit": colors["green"],
+    "miss": colors["red"],
+    "flush": colors["blue"],
 }
 
 class Chart(object):
-    defaults = {'width':700, 'height': 280}
-    def __init__(self, tree, bucket, prefix, time='-1hours', template='plain'):
+    defaults = {"width":700, "height": 280}
+    def __init__(self, tree, bucket, prefix, time="-1hours", template="plain"):
         self.tree = tree
         self.bucket = bucket
-        self.prefix = '' if prefix == 'stats' else prefix
-        self.base = 'stats' + ('.%s' % (self.prefix) if self.prefix else '')
+        self.prefix = "" if prefix == "stats" else prefix
+        self.base = "stats" + (".%s" % (self.prefix) if self.prefix else "")
         self.chartmap = {}
         self.charts = []
         for key,value in tree.iteritems():
-            chart = ['%s:%s.%s' % (bucket, key, db) for db in value]
+            chart = ["%s:%s.%s" % (bucket, key, db) for db in value]
             self.charts.append(chart)
             self.chartmap[key] = chart
         self.time = time
@@ -266,20 +266,20 @@ class Chart(object):
         kws = dict(self.defaults)
         time = time or self.time
         template = template or self.template
-        kws.update({'template': template, 'from': time})
+        kws.update({"template": template, "from": time})
         final_targets = []
         for target in targets:
-            final = '%s.%s' % (self.base, target)
-            func = 'alias(keepLastValue(%s),"%s")' % (final, target.rsplit('.',1)[1])
-            if 'timers' in self.base and target.endswith('mean'):
+            final = "%s.%s" % (self.base, target)
+            func = 'alias(keepLastValue(%s),"%s")' % (final, target.rsplit(".",1)[1])
+            if "timers" in self.base and target.endswith("mean"):
                 final_targets.insert(0, func)
             else:
                 final_targets.append(func)
-        kws['target'] = final_targets
-        kws['title'] = key
-        target_keys = [t.rsplit('.',1)[1] for t in targets]
+        kws["target"] = final_targets
+        kws["title"] = key
+        target_keys = [t.rsplit(".",1)[1] for t in targets]
         if all([t in color_map for t in target_keys]):
-            kws['colorList'] = ','.join([color_map[t] for t in target_keys])
-        return base + '/render/?%s' % urllib.urlencode(kws, doseq=True)
+            kws["colorList"] = ",".join([color_map[t] for t in target_keys])
+        return base + "/render/?%s" % urllib.urlencode(kws, doseq=True)
 
 

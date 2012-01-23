@@ -6,8 +6,9 @@
 {% endblock %}
 
 {% block sidebar %}
-
+	{#
 	{{ lib.sidebar_dashboard() }}
+	#}
 	{{ lib.sidebar_logfiles(info['logfiles'], current, loggers, logger) }}
 	{{ lib.sidebar_stats(stats) }}
 

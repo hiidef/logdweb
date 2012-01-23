@@ -19,6 +19,7 @@ urlpatterns = patterns('logdweb.views',
     # stats
     (r'^stats/(?P<stat>[^/]+)/?$', 'stats_index', {}, 'logd-stat-index'),
     (r'^stats/(?P<stat>[^/]+)/(?P<bucket>[^/]+)/?$', 'stats_chart', {}, 'logd-stat-chart'),
+    (r'^chart/(?P<path>[^/]+)/?$', 'chart_detail', {}, 'logd-chart-detail'),
     # logs
     (r'^(?P<path>[^/]+)/?$', 'path_index', {}, 'logd-path-index'),
     (r'^(?P<path>[^/]+)/search/?$', 'path_search', {}, 'logd-path-search'),

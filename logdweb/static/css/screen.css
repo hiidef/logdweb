@@ -154,12 +154,20 @@ td.time {
 
 .hidden { display: none; }
 
+.timers a { color: #999; }
+.timers a:hover { color: #444; }
 .timers {
     color: #666;
     margin-top: 10px;
     text-align: right;
-    font-size: 66%;
+    font-size: 85%;
 }
+
+.controls { float: right; margin-top: -3.8em; }
+.contrast { font-size: 150%; }
+.off { color: gray; text-shadow: 0 0 1px #ddd; }
+.controls a:hover { text-decoration: none; }
+a.toggle, a.on { color: black; }
 
 .search {
     float: right;
@@ -211,7 +219,6 @@ input.limit {
     font-size: 66%;
 }
 
-.timers a { color: #999; }
 .timer-info { display: none; }
 
 div.chart {

@@ -112,7 +112,9 @@ function subFuzzyTime(t1, t2) {
             src = src.replace(new RegExp(key + "=[^&]+"), "");
           }
         } else {
-          src += '&' + key + '=' + opts[key];
+          if (val != false) {
+            src += '&' + key + '=' + opts[key];
+          }
         }
       }
       this.src = src
@@ -177,7 +179,10 @@ function subFuzzyTime(t1, t2) {
       e.preventDefault();
       var $this = $(this);
       var opts = eval('('+$this.attr('change')+')');
-      viewSettings.timeStep = opts.from;
+      opts.until = false;
+      if ('from' in opts) {
+        viewSettings.timeStep = opts.from;
+      }
       $('div.chart img').alterChart(opts);
       $('.timers a').removeClass('on');
       $this.addClass('on');

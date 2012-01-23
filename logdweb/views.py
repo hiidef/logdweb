@@ -159,13 +159,28 @@ def stats_index(request, stat):
 
 @superuser_required
 def stats_chart(request, stat, bucket):
-    time = request.GET.get('time', '-1hours')
-    template = request.GET.get('template', 'plain')
+    time = request.GET.get("time", "-1hours")
+    template = request.GET.get("template", "plain")
     graphite = models.Graphite()
-    pref, bucket = bucket.split('.', 1)
+    pref, bucket = bucket.split(".", 1)
     stats = models.Graphite().get_stats()
     chart = dict([(k,v) for k,v in stats[stat][pref].items() if k.startswith(bucket)])
     chart = models.Chart(chart, stat, pref, time=time, template=template)
     context = make_context(stat=stat, bucket=bucket, chart=chart)
-    return render_to_response('logdweb/charts.jinja', context, request)
+    return render_to_response("logdweb/charts.jinja", context, request)
+
+@superuser_required
+def chart_detail(request, path):
+    time = request.GET.get("time", "-1hours")
+    template = request.GET.get("template", "plain")
+    graphite = models.Graphite()
+    name, bucket = path.split(":", 1)
+    type, statpath = bucket.split(".", 1)
+    stats = models.Graphite().get_stats()
+
+    chart = dict([(k,v) for k,v in stats[name][type].items() if k.startswith(statpath)])
+    chart = models.Chart(chart, name, type, time=time, template=template)
+    context = make_context(stat=name, bucket=bucket, chart=chart)
+
+    return render_to_response("logdweb/chart-detail.jinja", context, request)
 
