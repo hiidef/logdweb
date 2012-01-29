@@ -179,6 +179,9 @@ function subFuzzyTime(t1, t2) {
       e.preventDefault();
       var $this = $(this);
       var opts = eval('('+$this.attr('change')+')');
+      if (typeof(opts) == 'undefined') {
+        return;
+      }
       opts.until = false;
       if ('from' in opts) {
         viewSettings.timeStep = opts.from;
@@ -224,12 +227,10 @@ function subFuzzyTime(t1, t2) {
       var $chart = $(this).parents(".chart-container").find("img");
       var opts = $chart.chartOptions();
       var from = addFuzzyTime(opts.from, viewSettings.timeStep);
+      var until = viewSettings.timeStep;
       if ("until" in opts) {
-        var until = addFuzzyTime(opts.until, viewSettings.timeStep);
-      } else {
-        var until = viewSettings.timeStep;
-      }
-
+        until = addFuzzyTime(opts.until, viewSettings.timeStep);
+      } 
       $chart.alterChart({from: from, until: until});
 
     });
