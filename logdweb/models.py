@@ -313,7 +313,7 @@ class ColorStatsMap(object):
     def set_stat(self, stat, color):
         if stat != 'name':
             self.items[stat] = color
-            db.logdweb.update({'name': 'color-stats-map'}, {'$set': {stat, color}})
+            db.logdweb.update({'name': 'color-stats-map'}, {'$set': {stat: color}})
 
     def delete_stat(self, stat):
         if stat != 'name':
