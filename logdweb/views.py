@@ -15,7 +15,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 
 from django_jinja2 import render_to_response, render_to_string
 
-from logdweb import models, settings
+from logdweb import models, settings, forms
 from logdweb.settings import timer
 
 from functools import wraps
@@ -62,7 +62,11 @@ def dashboard_index(request):
 
 @superuser_required
 def config_index(request):
-    return render_to_response('logdweb/index.jinja', make_context(), request)
+    color_map_form = forms.ColorNameForm()
+    color_stats_form = forms.ColorStatsForm()
+    color_name_map = models.ColorNameMap()
+    color_stats_map = models.ColorStatsMap()
+    return render_to_response('logdweb/config.jinja', make_context(**locals()), request)
 
 @superuser_required
 def index(request):

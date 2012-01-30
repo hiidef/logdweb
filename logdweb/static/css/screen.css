@@ -41,6 +41,9 @@ code, pre {
     background-color: inherit;
 }
 
+.right { float: right; }
+.thin { width: 2em; }
+.clear { clear: both; }
 /* groovy gray gradient header, a-la github */
 
 #header {
@@ -133,7 +136,7 @@ div.log-container {
 .log { border: 0; }
 .log td { border: 0; border-bottom: 1px solid #eee; padding: 2px 3px; }
 .log tr { border: 0; }
-table th, table td { line-height: 13px; }
+.log table th, .log table td { line-height: 13px; }
 
 /* highlighted code */
 .log pre, .log code {
@@ -254,3 +257,25 @@ div.overlay {
 div.overlay.left { top: 0; left: 0; }
 div.overlay.right { top: 0; left: 715px; }
 
+
+.map-sample {
+    height: 12px; width: 12px; 
+   /* border: 1px solid black;*/
+    box-shadow: 1px 1px 1px #eee;
+    display: inline-block;
+}
+.map-sample:hover {
+    box-shadow: 1px 1px 1px #999;
+}
+
+ul.colormap {
+    margin-left: 2em;
+}
+ul.colormap li { padding-bottom: 3px; }
+
+.edit { display: none; }
+table.inline-edit .delete { display: none; }
+table.inline-edit tr:hover .edit { display: inline; }
+table.inline-edit tbody tr:hover { cursor: pointer; }
+table.inline-edit td.info:hover .delete { display: inline; }
+table.inline-edit td.info { padding-bottom: 2px; }

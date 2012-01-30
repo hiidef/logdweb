@@ -29,7 +29,7 @@ class Logd(object):
     @timer.timeit('models.logd.server_info')
     def server_info(self):
         """Return info about the server in general."""
-        system_collections = ('system.indexes', 'config')
+        system_collections = ('system.indexes', 'config', 'logdweb')
         logfiles = [name for name in db.collection_names() if
                 name not in system_collections]
         info = []
@@ -68,7 +68,8 @@ class Logd(object):
     @timer.timeit('models.logd.get_loggers')
     def get_loggers(self, path):
         """Return a list of the logger names on a logfile."""
-        loggers = db.config.find_one({'name':path}).get('loggers', [])
+        loggers = db.config.find_one({'name':path})
+        loggers = loggers.get('loggers', []) if loggers else []
         return list(sorted(loggers))
 
     @timer.timeit('models.logd.get_line')
@@ -222,6 +223,103 @@ def stats_tree(keys):
     tree = dict([(k,{}) for k in keys])
     reduce_tree(tree)
     return tree
+
+
+class ColorNameMap(object):
+    """Manage a map of names -> colors."""
+    def __init__(self):
+        self.items = self.update()
+        if self.items is None:
+            self.initialize_defaults()
+            self.items = self.update()
+
+    def lookup(self, name, theme="default"):
+        """Return the color for a name, if it's found, or the name itself
+        if it isn't."""
+        theme = self.items.get(theme, {})
+        return theme.get(name, name)
+
+    def update(self):
+        self.items = db.logdweb.find_one({"name": "color-name-map"})
+        return dict(self.items) if self.items else self.items
+
+    def initialize_defaults(self):
+        mapping = {
+            "dkgray" : "#2d2d2d",
+            "ltgray" : "#cccccc",
+            "mdgray" : "#999999",
+            "red": "#f2777a",
+            "orange": "#f99157",
+            "yellow": "#ffcc66",
+            "green": "#99cc99",
+            "aqua": "#66cccc",
+            "blue": "#6699cc",
+            "purple": "#cc99cc",
+        }
+        db.logdweb.insert({
+            "name": "color-name-map",
+            "default": mapping,
+            "current": "default"
+        })
+
+    def themes(self):
+        return dict([(k,v) for k,v in self.items.items() if k not in ("_id", "name", "current")])
+
+    def delete_color(self, name, theme="default"):
+        themes = self.themes()
+        if theme in themes:
+            themes[theme].pop(name, None)
+            db.logdweb.update({"name": "color-name-map"}, {"$set" : {theme: themes[theme]}})
+
+    def set_color(self, name, color, theme="default"):
+        """Set a name to a color in a theme."""
+        themes = self.themes()
+        if theme in themes:
+            themes[theme][name] = color
+        else:
+            themes[theme] = {name:color}
+        db.logdweb.update({"name": "color-name-map"}, {"$set" : {theme: themes[theme]}})
+
+
+class ColorStatsMap(object):
+    """Manage a map of stats -> color names (or colors)."""
+    def __init__(self):
+        self.items = self.update()
+        if not self.items:
+            self.initialize_defaults()
+            self.items = self.update()
+
+    def update(self):
+        self.items = db.logdweb.find_one({'name': 'color-stats-map'})
+        return dict(self.items) if self.items else self.items
+
+    def initialize_defaults(self):
+        default = {
+            'name': 'color-stats-map',
+            'success': 'green',
+            'failure': 'red',
+            'warning': 'orange',
+            'hit': 'green',
+            'miss': 'red',
+            'good': 'green',
+            'bad': 'red'
+        }
+        db.logdweb.insert(default)
+
+    def mapping(self):
+        system_names = ["_id", "name"]
+        return dict([(k,v) for k,v in self.items.items() if k not in system_names])
+
+    def set_stat(self, stat, color):
+        if stat != 'name':
+            self.items[stat] = color
+            db.logdweb.update({'name': 'color-stats-map'}, {'$set': {stat, color}})
+
+    def delete_stat(self, stat):
+        if stat != 'name':
+            self.items.pop('stat', None)
+            db.logdweb.update({'name': 'color-stats-map'}, {'$unset': stat})
+
 
 # these colors are from the Tomorrow-Theme:
 #  https://github.com/ChrisKempson/Tomorrow-Theme

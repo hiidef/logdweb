@@ -1,0 +1,85 @@
+{% extends "logdweb/base.jinja" %}
+{% import "logdweb/lib.jinja" as lib without context %}
+
+{% block header %}
+	<h1 class="title"><a href="{{ reverse('logd-index') }}">logd admin</a></h1>
+{% endblock %}
+
+{% block sidebar %}
+	{{ lib.sidebar_dashboard() }}
+	{{ lib.sidebar_logfiles(info['logfiles'], current, loggers, logger) }}
+	{{ lib.sidebar_stats(stats) }}
+{% endblock %}
+
+{% block main %}
+
+	<h2>Chart Configuration</h2>
+
+	<p>Configure the visual aspects of your charts and map certain stats to
+	certain colors.</p>
+
+	<form style="margin-top: 1em;" action="#" method="POST">
+		<fieldset>
+		<div class="clearfix">
+			<label for="bgcolor">background color:</label>
+			<div class="input"><input class="xlarge" size="10" type="text" name="bgcolor" id="bgcolor" value="#ffffff" ></div>
+		</div>
+		<div class="clearfix">
+			<label for="fgcolor">font color:</label>
+			<div class="input"><input class="xlarge" size="10" type="text" name="fgcolor" id="fgcolor" value="#ffffff" ></div>
+		</div>
+		</fieldset>
+	</form>
+	<div>
+		<form action="" method="POST">
+		<label>stat colors:</label>
+		<div class="input">
+			<table class="zebra-striped condensed-table inline-edit">
+				<thead><th class="thin"></th><th>stat</th><th>color</th><th style="width: 8em;"></th></thead>
+				<tbody>
+				{% for stat,color in sorted(color_stats_map.mapping().items()) %}
+				<tr>
+					<td><div class="map-sample" style="background-color: {{color_name_map.lookup(color)}};"></div></td>
+					<td class="stat">{{ stat }}</td>
+					<td class="color">{{ color }}</td>
+					<td class="info"><span class="label notice edit">edit</span> <a class="label important delete">del</a></td>
+				</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+			<div class="right"><button class="btn success">+ add</button></div>
+			<div class="clear"></div>
+		</div>
+		</form>
+	</div>
+	<div>
+		<form action="" method="POST">
+			<label>saved colors:</label>
+			<div class="input">
+				{#<h4>{{ theme_name }} {% if theme_name != "default" %}<a class="label important" href="#">delete</a>{% endif %}</h4>#}
+				{% set themes = color_name_map.themes() %}
+				{% for theme_name in themes %}
+				<table class="zebra-striped condensed-table inline-edit">
+				<thead><th class="thin"></th><th>name</th><th style="width: 8em;"></th></thead>
+				<tbody>
+					{% for name, color in sorted(themes[theme_name].items()) %}
+					<tr>
+						<td><div class="map-sample" style="background-color: {{color}};"></div></td>
+						<td>{{ name }}</td>
+						<td class="info"><span class="label notice edit">edit</span> <a class="label important delete">del</a></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+				</table>
+				{% endfor %}
+
+			</div>
+			<div class="right"><button class="btn success">+ add</button></div>
+			<div class="clear"></div>
+		</form>
+	</div>
+
+	<div class="clear"></div>
+	{{ lib.show_timers(timers) }}
+
+{% endblock %}
