@@ -18,8 +18,8 @@
 
 		<h2>{% if level or logger or details %}<a href="{{ reverse('logd-path-index', kwargs={'path':path}) }}">{{ path }}</a>{% else %}{{ path }}
       <span class="log-labels">
-        <a class="btn btn-info" href="{{ reverse('logd-path-info', kwargs={'path': path}) }}"><i class="icon-info-sign icon-white"></i> info</a>
-        <a class="btn btn-danger" data-controls-modal="{{ path|jsclass}}-confirm-delete" data-backdrop="true" data-keyboard="true" href="#"><i class="icon-trash icon-white"></i> delete</a>
+        <a class="btn btn-small btn-info" href="{{ reverse('logd-path-info', kwargs={'path': path}) }}"><i class="icon-info-sign icon-white"></i> info</a>
+        <a class="btn btn-small btn-danger" data-controls-modal="{{ path|jsclass}}-confirm-delete" data-backdrop="true" data-keyboard="true" href="#"><i class="icon-trash icon-white"></i> delete</a>
       </span>
     {% endif %}
     </h2>
