@@ -111,7 +111,7 @@ code, pre {
     border-radius: 5px;
     box-shadow: 1px 1px 3px #c5c5c5;
     min-height: 700px;
-    min-width: 750px;
+    /* min-width: 750px; */
     padding: 20px;
     margin: 2em 0 2em 2em;
     margin-right: 350px;
