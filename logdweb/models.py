@@ -178,11 +178,12 @@ class Graphite(object):
                 prefix, bucket = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['meters'][bucket] = stat
-            elif ':' in key:
+            else:
                 k = key.replace('stats.', '')
                 prefix, bucket = split_key(k)
                 buckets.setdefault(prefix, base())
                 buckets[prefix]['stats'][bucket] = stat
+
 
         # set for 30 seconds
         if usecache:
