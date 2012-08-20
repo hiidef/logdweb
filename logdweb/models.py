@@ -347,7 +347,7 @@ class Chart(object):
     def __init__(self, tree, bucket, prefix, time="-1hours", template="plain"):
         self.tree = tree
         self.bucket = bucket
-        self.prefix = "" if prefix == "stats" else prefix
+        self.prefix = "" if prefix == "default" else prefix
         self.base = "stats" + (".%s" % (self.prefix) if self.prefix else "")
         self.chartmap = {}
         self.charts = []
