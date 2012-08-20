@@ -347,12 +347,13 @@ class Chart(object):
     def __init__(self, tree, bucket, prefix, time="-1hours", template="plain"):
         self.tree = tree
         self.bucket = bucket
-        self.prefix = "" if prefix == "default" else prefix
+        self.prefix = "" if prefix == "stats" else prefix
         self.base = "stats" + (".%s" % (self.prefix) if self.prefix else "")
         self.chartmap = {}
         self.charts = []
+        bucketstr = "%s:" % bucket if bucket != "default" else ""
         for key,value in tree.iteritems():
-            chart = ["%s:%s.%s" % (bucket, key, db) for db in value]
+            chart = ["%s%s.%s" % (bucketstr, key, db) for db in value]
             self.charts.append(chart)
             self.chartmap[key] = chart
         self.time = time
