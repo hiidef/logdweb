@@ -74,7 +74,10 @@ class Logd(object):
 
     @timer.timeit('models.logd.get_line')
     def get_line(self, path, line):
-        from pymongo import objectid
+        try:
+            from pymongo import objectid
+        except ImportError:
+            from bson import objectid
         # 'line' is no longer a monotonically increasing integer;  it's probably
         # a mongo _id object
         return db[path].find_one({'_id': objectid.ObjectId(line)})
