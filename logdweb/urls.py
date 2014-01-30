@@ -4,7 +4,7 @@
 """logdweb urls."""
 
 import os
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 
 moduledir = os.path.dirname(__file__)
 docroot = os.path.abspath(os.path.join(moduledir, './static'))
